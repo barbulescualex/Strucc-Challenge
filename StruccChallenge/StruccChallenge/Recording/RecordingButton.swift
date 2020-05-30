@@ -23,12 +23,12 @@ class RecordingButton: UIView {
     public weak var delegate : RecordingButtonDelegate?
     
     //internal UI state
-    private var size : CGFloat
-    private var circlePath : CGPath
-    private var squarePath : CGPath
+    fileprivate var size : CGFloat
+    fileprivate var circlePath : CGPath
+    fileprivate var squarePath : CGPath
     
     //MARK:- View Components
-    private let backgroundView : UIView = {
+    fileprivate let backgroundView : UIView = {
         let view = UIView()
         view.backgroundColor = .white
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -36,7 +36,7 @@ class RecordingButton: UIView {
         return view
     }()
     
-    private var shapeLayer = CAShapeLayer()
+    fileprivate var shapeLayer = CAShapeLayer()
     
     //MARK:- Init
     public init(withSize size: CGFloat) {

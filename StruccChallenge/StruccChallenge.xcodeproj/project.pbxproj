@@ -15,6 +15,7 @@
 		FA3806642482C1FF0073D6EA /* RecordingButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA3806632482C1FF0073D6EA /* RecordingButton.swift */; };
 		FA3806672482C24A0073D6EA /* CAHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA3806662482C24A0073D6EA /* CAHelper.swift */; };
 		FA3806692482C25B0073D6EA /* LayoutHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA3806682482C25B0073D6EA /* LayoutHelper.swift */; };
+		FA38066B2482E3930073D6EA /* AVManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA38066A2482E3930073D6EA /* AVManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		FA3806632482C1FF0073D6EA /* RecordingButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingButton.swift; sourceTree = "<group>"; };
 		FA3806662482C24A0073D6EA /* CAHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CAHelper.swift; sourceTree = "<group>"; };
 		FA3806682482C25B0073D6EA /* LayoutHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutHelper.swift; sourceTree = "<group>"; };
+		FA38066A2482E3930073D6EA /* AVManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AVManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -92,6 +94,7 @@
 			children = (
 				FA3806502482AC9A0073D6EA /* RecordingViewController.swift */,
 				FA3806632482C1FF0073D6EA /* RecordingButton.swift */,
+				FA38066A2482E3930073D6EA /* AVManager.swift */,
 			);
 			path = Recording;
 			sourceTree = "<group>";
@@ -176,6 +179,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FA3806512482AC9A0073D6EA /* RecordingViewController.swift in Sources */,
+				FA38066B2482E3930073D6EA /* AVManager.swift in Sources */,
 				FA3806692482C25B0073D6EA /* LayoutHelper.swift in Sources */,
 				FA3806642482C1FF0073D6EA /* RecordingButton.swift in Sources */,
 				FA3806672482C24A0073D6EA /* CAHelper.swift in Sources */,
