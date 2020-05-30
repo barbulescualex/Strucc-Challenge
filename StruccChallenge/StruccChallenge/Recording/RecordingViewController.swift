@@ -7,11 +7,12 @@
 //
 
 import UIKit
+import AVFoundation
 
 /* For first stage of the app, the recording scene */
 class RecordingViewController: UIViewController {
     //MARK:- Vars
-    
+    fileprivate var avManager : AVManager?
     
     //MARK:- View Components
     fileprivate let recordingButton = RecordingButton(withSize: 74)
@@ -24,6 +25,8 @@ class RecordingViewController: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
+    
+    fileprivate var previewLayer : AVCaptureVideoPreviewLayer?
 
     //MARK:- Lifecycle
     override func viewDidLoad() {
@@ -61,9 +64,9 @@ class RecordingViewController: UIViewController {
     }
     
     fileprivate func setup(){
-        //enable buttons
-        self.recordingButton.isUserInteractionEnabled = true
-        self.switchCameraButton.isUserInteractionEnabled = true
+        avManager = AVManager()
+        avManager?.delegate = self
+        avManager?.configureAndStart()
     }
     
     //MARK:- Functions
@@ -102,5 +105,35 @@ class RecordingViewController: UIViewController {
         }
     }
 
+}
+
+extension RecordingViewController : AVManagerDelegate {
+    func sessionStarted(manager: AVManager) {
+        //let user interact with session
+        //enable buttons
+        self.recordingButton.isUserInteractionEnabled = true
+        self.switchCameraButton.isUserInteractionEnabled = true
+    }
+    
+    func sessionError(manager: AVManager) {
+        //deallocate manager
+        avManager = nil
+        
+        //remove preview layer (if there)
+        previewLayer?.removeFromSuperlayer()
+        
+        //inform user of issue?
+        
+        //try it again
+        setup()
+    }
+    
+    func sessionPreviewLayerReady(previewLayer layer: AVCaptureVideoPreviewLayer, manager: AVManager) {
+        //add preview layer to our view hierarchy
+        view.layer.insertSublayer(layer, below: recordingButton.layer)
+        layer.frame = self.view.layer.frame
+    }
+    
+    
 }
 
