@@ -25,12 +25,14 @@ class AVManager : NSObject {
     //MARK:- Vars
     public weak var delegate : AVManagerDelegate?
     
-    var captureSession : AVCaptureSession!
+    fileprivate var captureSession : AVCaptureSession!
     
-    var backCamera : AVCaptureDevice!
-    var frontCamera : AVCaptureDevice!
-    var backInput : AVCaptureInput!
-    var frontInput : AVCaptureInput!
+    fileprivate var backCamera : AVCaptureDevice!
+    fileprivate var frontCamera : AVCaptureDevice!
+    fileprivate var backInput : AVCaptureInput!
+    fileprivate var frontInput : AVCaptureInput!
+    
+    fileprivate var backCameraOn = true
     
     //MARK:- Init
     public override init(){
@@ -135,6 +137,32 @@ class AVManager : NSObject {
         DispatchQueue.main.async {
             self.delegate?.sessionPreviewLayerReady(previewLayer: previewLayer, manager: self)
         }
+    }
+    
+    //MARK:- Functions
+    public func switchCamera(){
+        captureSession.beginConfiguration()
+        if backCameraOn {
+            captureSession.removeInput(backInput)
+            if captureSession.canAddInput(frontInput) {
+                captureSession.addInput(frontInput)
+                backCameraOn = false
+            } else {
+                //don't switch
+                self.captureSession.addInput(self.backInput)
+            }
+        } else {
+            captureSession.removeInput(frontInput)
+            if captureSession.canAddInput(backInput) {
+                captureSession.addInput(backInput)
+                backCameraOn = true
+            } else {
+                //don't switch
+                captureSession.addInput(frontInput)
+            }
+        }
+        //commit config
+        captureSession.commitConfiguration()
     }
     
     //MARK:- Notifications

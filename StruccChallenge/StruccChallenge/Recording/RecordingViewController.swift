@@ -61,12 +61,18 @@ class RecordingViewController: UIViewController {
         ])
         
         switchCameraButton.isUserInteractionEnabled = false
+        switchCameraButton.addTarget(self, action: #selector(switchCamera(_:)), for: .touchUpInside)
     }
     
     fileprivate func setup(){
         avManager = AVManager()
         avManager?.delegate = self
         avManager?.configureAndStart()
+    }
+    
+    //MARK:- Actions
+    @objc fileprivate func switchCamera(_ sender: UIButton){
+        avManager?.switchCamera()
     }
     
     //MARK:- Functions
@@ -107,6 +113,7 @@ class RecordingViewController: UIViewController {
 
 }
 
+//MARK:- AVManagerDelegate
 extension RecordingViewController : AVManagerDelegate {
     func sessionStarted(manager: AVManager) {
         //let user interact with session
