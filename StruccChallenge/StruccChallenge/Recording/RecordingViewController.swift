@@ -115,6 +115,18 @@ class RecordingViewController: UIViewController {
 
 //MARK:- AVManagerDelegate
 extension RecordingViewController : RecordingDelegate {
+    func writerReady(manager: RecordingManager) {
+        
+    }
+    
+    func writerError(manager: RecordingManager) {
+        
+    }
+    
+    func writerFinished(manager: RecordingManager) {
+        
+    }
+    
     func sessionStarted(manager: RecordingManager) {
         //let user interact with session
         //enable buttons
