@@ -196,6 +196,9 @@ class RecordingManager : NSObject {
             return false
         }
         
+        //fix to portrait orientation
+        videoOutput.connections.first?.videoOrientation = .portrait
+        
         //audio
         audioOutput = AVCaptureAudioDataOutput()
         
@@ -241,6 +244,13 @@ class RecordingManager : NSObject {
                 captureSession.addInput(frontInput)
             }
         }
+        
+        //fix to portrait orientation
+        videoOutput.connections.first?.videoOrientation = .portrait
+             
+        //mirror video if front camera
+        videoOutput.connections.first?.isVideoMirrored = !backCameraOn
+        
         //commit config
         captureSession.commitConfiguration()
     }
