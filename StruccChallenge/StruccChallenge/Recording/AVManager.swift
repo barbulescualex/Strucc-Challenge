@@ -27,12 +27,21 @@ class AVManager : NSObject {
     
     fileprivate var captureSession : AVCaptureSession!
     
+    //cameras
     fileprivate var backCamera : AVCaptureDevice!
     fileprivate var frontCamera : AVCaptureDevice!
     fileprivate var backInput : AVCaptureInput!
     fileprivate var frontInput : AVCaptureInput!
     
     fileprivate var backCameraOn = true
+    
+    //microphone
+    fileprivate var microphone : AVCaptureDevice!
+    fileprivate var microphoneInput : AVCaptureInput!
+    
+    //outputs
+    fileprivate var videoOutput : AVCaptureVideoDataOutput!
+    fileprivate var audioOutput : AVCaptureAudioDataOutput!
     
     //MARK:- Init
     public override init(){
@@ -55,6 +64,10 @@ class AVManager : NSObject {
             self.captureSession.automaticallyConfiguresCaptureDeviceForWideColor = true
             
             if !self.setupInputs() { //was a problem, end configuration
+                return
+            }
+            
+            if !self.setupOutputs() {
                 return
             }
             
@@ -129,7 +142,72 @@ class AVManager : NSObject {
             return false
         }
         
+        //get microphone
+        if let device = AVCaptureDevice.default(for: .audio) {
+            microphone = device
+        } else {
+            //no microphone
+            print("no microphone")
+            DispatchQueue.main.async {
+                self.delegate?.sessionError(manager: self)
+            }
+            return false
+        }
+        
+        guard let mInput = try? AVCaptureDeviceInput(device: microphone) else {
+            print("could not make mic input")
+            DispatchQueue.main.async {
+                self.delegate?.sessionError(manager: self)
+            }
+            return false
+        }
+        microphoneInput = mInput
+        
+        //attach microphone to session
+        if captureSession.canAddInput(microphoneInput) {
+            captureSession.addInput(microphoneInput)
+        } else {
+            DispatchQueue.main.async {
+                self.delegate?.sessionError(manager: self)
+            }
+            return false
+        }
+        
         return true //all good
+    }
+    
+    fileprivate func setupOutputs() -> Bool {
+        //callback queue
+        let avQueue = DispatchQueue(label: "ca.alexs.av-queue", qos: .userInitiated)
+        
+        //video
+        videoOutput = AVCaptureVideoDataOutput()
+        videoOutput.alwaysDiscardsLateVideoFrames = true
+        
+        if captureSession.canAddOutput(videoOutput){
+            videoOutput.setSampleBufferDelegate(self, queue: avQueue)
+            captureSession.addOutput(videoOutput)
+        } else {
+            DispatchQueue.main.async {
+                self.delegate?.sessionError(manager: self)
+            }
+            return false
+        }
+        
+        //audio
+        audioOutput = AVCaptureAudioDataOutput()
+        
+        if captureSession.canAddOutput(audioOutput){
+            audioOutput.setSampleBufferDelegate(self, queue: avQueue)
+            captureSession.addOutput(audioOutput)
+        } else {
+            DispatchQueue.main.async {
+                self.delegate?.sessionError(manager: self)
+            }
+            return false
+        }
+        
+        return true
     }
     
     fileprivate func setupPreviewLayer(){
@@ -188,6 +266,13 @@ class AVManager : NSObject {
         NotificationCenter.default.removeObserver(self)
     }
     
+}
+
+//MARK:- Output Callback
+extension AVManager : AVCaptureVideoDataOutputSampleBufferDelegate, AVCaptureAudioDataOutputSampleBufferDelegate {
+    func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
+        
+    }
 }
 
 //MARK:- Permissions
