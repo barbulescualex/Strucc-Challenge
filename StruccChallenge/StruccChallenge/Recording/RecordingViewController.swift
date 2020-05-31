@@ -14,6 +14,8 @@ class RecordingViewController: UIViewController {
     //MARK:- Vars
     fileprivate var recordingManager : RecordingManager?
     
+    fileprivate var videoNumber = 0
+    
     //MARK:- View Components
     fileprivate let recordingButton = RecordingButton(withSize: 74)
     
@@ -49,6 +51,7 @@ class RecordingViewController: UIViewController {
         ])
         
         recordingButton.isUserInteractionEnabled = false
+        recordingButton.delegate = self
         
         //camera button
         view.addSubview(switchCameraButton)
@@ -113,10 +116,35 @@ class RecordingViewController: UIViewController {
 
 }
 
+//MARK:- Recording Button Delegate
+extension RecordingViewController : RecordingButtonDelegate {
+    func didStartRecording(_ button: RecordingButton) {
+        //tell manager to start recording
+        recordingManager?.startRecording()
+        
+        //don't let user switch camera
+        switchCameraButton.isUserInteractionEnabled = false
+    }
+    
+    func didStopRecording(_ button: RecordingButton) {
+        //tell manager to stop recording
+        recordingManager?.stopRecording()
+        
+        //disable capture button, once writer finishes and next writer starts, capture button will work again
+        recordingButton.isUserInteractionEnabled = false
+        
+        //turn on camera switching
+        switchCameraButton.isUserInteractionEnabled = true
+    }
+    
+    
+}
+
 //MARK:- AVManagerDelegate
 extension RecordingViewController : RecordingDelegate {
     func writerReady(manager: RecordingManager) {
-        
+        //enable recording, writer is ready so users can record
+        recordingButton.isUserInteractionEnabled = true
     }
     
     func writerError(manager: RecordingManager) {
@@ -124,14 +152,19 @@ extension RecordingViewController : RecordingDelegate {
     }
     
     func writerFinished(manager: RecordingManager) {
-        
+        if videoNumber < 2 { //we still need second video
+            videoNumber += 1
+            manager.setupWriter(forVideoNumber: videoNumber)
+        } else {
+            print("captured 2 videos!")
+            //go to next screen
+        }
     }
     
     func sessionStarted(manager: RecordingManager) {
-        //let user interact with session
-        //enable buttons
-        self.recordingButton.isUserInteractionEnabled = true
-        self.switchCameraButton.isUserInteractionEnabled = true
+        //setup writer
+        videoNumber += 1
+        manager.setupWriter(forVideoNumber: videoNumber)
     }
     
     func sessionError(manager: RecordingManager) {
