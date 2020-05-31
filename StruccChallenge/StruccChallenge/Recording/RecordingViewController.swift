@@ -12,7 +12,7 @@ import AVFoundation
 /* For first stage of the app, the recording scene */
 class RecordingViewController: UIViewController {
     //MARK:- Vars
-    fileprivate var avManager : AVManager?
+    fileprivate var recordingManager : RecordingManager?
     
     //MARK:- View Components
     fileprivate let recordingButton = RecordingButton(withSize: 74)
@@ -65,23 +65,23 @@ class RecordingViewController: UIViewController {
     }
     
     fileprivate func setup(){
-        avManager = AVManager()
-        avManager?.delegate = self
-        avManager?.configureAndStart()
+        recordingManager = RecordingManager()
+        recordingManager?.delegate = self
+        recordingManager?.configureAndStart()
     }
     
     //MARK:- Actions
     @objc fileprivate func switchCamera(_ sender: UIButton){
-        avManager?.switchCamera()
+        recordingManager?.switchCamera()
     }
     
     //MARK:- Functions
     fileprivate func checkPermissions(){
-        AVManager.checkCameraPermissions { [weak self] allowed in
+        RecordingManager.checkCameraPermissions { [weak self] allowed in
             guard let self = self else {return}
             if allowed {
                 //check if audio is allowed
-                AVManager.checkAudioPermissions { [weak self] allowed in
+                RecordingManager.checkAudioPermissions { [weak self] allowed in
                     guard let self = self else {return}
                     DispatchQueue.main.async {
                         if allowed {
@@ -114,17 +114,17 @@ class RecordingViewController: UIViewController {
 }
 
 //MARK:- AVManagerDelegate
-extension RecordingViewController : AVManagerDelegate {
-    func sessionStarted(manager: AVManager) {
+extension RecordingViewController : RecordingDelegate {
+    func sessionStarted(manager: RecordingManager) {
         //let user interact with session
         //enable buttons
         self.recordingButton.isUserInteractionEnabled = true
         self.switchCameraButton.isUserInteractionEnabled = true
     }
     
-    func sessionError(manager: AVManager) {
+    func sessionError(manager: RecordingManager) {
         //deallocate manager
-        avManager = nil
+        recordingManager = nil
         
         //remove preview layer (if there)
         previewLayer?.removeFromSuperlayer()
@@ -135,7 +135,7 @@ extension RecordingViewController : AVManagerDelegate {
         setup()
     }
     
-    func sessionPreviewLayerReady(previewLayer layer: AVCaptureVideoPreviewLayer, manager: AVManager) {
+    func sessionPreviewLayerReady(previewLayer layer: AVCaptureVideoPreviewLayer, manager: RecordingManager) {
         //add preview layer to our view hierarchy
         view.layer.insertSublayer(layer, below: recordingButton.layer)
         layer.frame = self.view.layer.frame

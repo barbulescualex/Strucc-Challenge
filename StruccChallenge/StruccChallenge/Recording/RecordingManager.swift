@@ -10,13 +10,13 @@ import UIKit
 import AVFoundation
 
 protocol RecordingDelegate : AnyObject {
-    //tell delegate session started
+    //tells the delegate session started
     func sessionStarted(manager: RecordingManager)
     
-    //tell delegate there's an issue with the session
+    //tells the delegate there's an issue with the session
     func sessionError(manager: RecordingManager)
     
-    //tell delegate it can add the preview to it's view hierarchy
+    //tells the delegate it can add the preview to it's view hierarchy
     func sessionPreviewLayerReady(previewLayer layer: AVCaptureVideoPreviewLayer, manager: RecordingManager)
 }
 
@@ -63,11 +63,11 @@ class RecordingManager : NSObject {
             }
             self.captureSession.automaticallyConfiguresCaptureDeviceForWideColor = true
             
-            if !self.setupInputs() { //was a problem, end configuration
+            if !self.setupCaptureInputs() { //was a problem, end configuration
                 return
             }
             
-            if !self.setupOutputs() {
+            if !self.setupCaptureOutputs() {
                 return
             }
             
@@ -78,10 +78,12 @@ class RecordingManager : NSObject {
         }
        
     }
-
-    //return boolean incase something was wrong so it capture session doesn't continue configuring in a bad state
-    //delegate will deallocate this manager object and try again
-    fileprivate func setupInputs() -> Bool {
+    
+    //MARK: AV Configuration
+    
+    /*return boolean incase something was wrong so it capture session doesn't continue configuring in a bad state
+    delegate will deallocate this manager object and try again*/
+    fileprivate func setupCaptureInputs() -> Bool {
         //get back camera in descending order of quality (depending on device)
         if let device = AVCaptureDevice.default(.builtInTripleCamera, for: .video, position: .back) {
             backCamera = device
@@ -176,7 +178,7 @@ class RecordingManager : NSObject {
         return true //all good
     }
     
-    fileprivate func setupOutputs() -> Bool {
+    fileprivate func setupCaptureOutputs() -> Bool {
         //callback queue
         let avQueue = DispatchQueue(label: "ca.alexs.av-queue", qos: .userInitiated)
         
