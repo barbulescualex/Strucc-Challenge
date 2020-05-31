@@ -64,7 +64,7 @@ class RecordingViewController: UIViewController {
         switchCameraButton.addTarget(self, action: #selector(switchCamera(_:)), for: .touchUpInside)
     }
     
-    fileprivate func setup(){
+    fileprivate func setupRecordingManager(){
         recordingManager = RecordingManager()
         recordingManager?.delegate = self
         recordingManager?.configureAndStart()
@@ -86,7 +86,7 @@ class RecordingViewController: UIViewController {
                     DispatchQueue.main.async {
                         if allowed {
                             //user can use the app
-                            self.setup()
+                            self.setupRecordingManager()
                         } else {
                             let warning = UIAlertController(title: "No Microphone Acess", message: "Please Allow Microphone Access In Settings", preferredStyle: .alert)
                             warning.addAction(UIAlertAction(title: "Okay", style: .cancel, handler: { (action: UIAlertAction) in
@@ -123,16 +123,18 @@ extension RecordingViewController : RecordingDelegate {
     }
     
     func sessionError(manager: RecordingManager) {
-        //deallocate manager
-        recordingManager = nil
-        
-        //remove preview layer (if there)
-        previewLayer?.removeFromSuperlayer()
-        
-        //inform user of issue?
-        
-        //try it again
-        setup()
+        let warning = UIAlertController(title: "Ooops", message: "Couldn't start camera", preferredStyle: .alert)
+        warning.addAction(UIAlertAction(title: "Try again", style: .default, handler: { [weak self] _ in
+            guard let self = self else {return}
+            
+            //deallocate recording manager, try process again
+            self.recordingManager = nil
+            
+            //remove preview layer (if there)
+            self.previewLayer?.removeFromSuperlayer()
+            
+            self.setupRecordingManager()
+        }))
     }
     
     func sessionPreviewLayerReady(previewLayer layer: AVCaptureVideoPreviewLayer, manager: RecordingManager) {
