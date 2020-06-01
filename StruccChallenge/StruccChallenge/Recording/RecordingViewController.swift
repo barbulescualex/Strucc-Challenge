@@ -158,6 +158,12 @@ extension RecordingViewController : RecordingDelegate {
         } else {
             print("captured 2 videos!")
             //go to next screen
+            let previewVC = PreviewViewController()
+            previewVC.modalPresentationStyle = .fullScreen
+            previewVC.modalTransitionStyle = .crossDissolve
+            self.present(previewVC, animated: true) {
+                //stop camera session..
+            }
         }
     }
     

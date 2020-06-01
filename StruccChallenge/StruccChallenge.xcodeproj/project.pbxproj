@@ -16,6 +16,10 @@
 		FA3806672482C24A0073D6EA /* CAHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA3806662482C24A0073D6EA /* CAHelper.swift */; };
 		FA3806692482C25B0073D6EA /* LayoutHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA3806682482C25B0073D6EA /* LayoutHelper.swift */; };
 		FA38066B2482E3930073D6EA /* RecordingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA38066A2482E3930073D6EA /* RecordingManager.swift */; };
+		FA91DB142484581D009C2B21 /* PreviewViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA91DB132484581D009C2B21 /* PreviewViewController.swift */; };
+		FAF29050248571950031CEA7 /* FilterCarousel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAF2904F248571950031CEA7 /* FilterCarousel.swift */; };
+		FAF29052248571BF0031CEA7 /* FilterModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = FAF29051248571BF0031CEA7 /* FilterModel.swift */; };
+		FAF290542485720B0031CEA7 /* PostGrotesk-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = FAF290532485720B0031CEA7 /* PostGrotesk-Bold.otf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +34,10 @@
 		FA3806662482C24A0073D6EA /* CAHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CAHelper.swift; sourceTree = "<group>"; };
 		FA3806682482C25B0073D6EA /* LayoutHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LayoutHelper.swift; sourceTree = "<group>"; };
 		FA38066A2482E3930073D6EA /* RecordingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RecordingManager.swift; sourceTree = "<group>"; };
+		FA91DB132484581D009C2B21 /* PreviewViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewViewController.swift; sourceTree = "<group>"; };
+		FAF2904F248571950031CEA7 /* FilterCarousel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterCarousel.swift; sourceTree = "<group>"; };
+		FAF29051248571BF0031CEA7 /* FilterModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterModel.swift; sourceTree = "<group>"; };
+		FAF290532485720B0031CEA7 /* PostGrotesk-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "PostGrotesk-Bold.otf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,6 +72,7 @@
 			children = (
 				FA3806602482AD280073D6EA /* LifeCycle */,
 				FA3806622482C1C50073D6EA /* Recording */,
+				FA91DB1224845805009C2B21 /* Preview */,
 				FA3806652482C2170073D6EA /* Helpers */,
 				FA3806612482AD3F0073D6EA /* Extras */,
 			);
@@ -82,6 +91,7 @@
 		FA3806612482AD3F0073D6EA /* Extras */ = {
 			isa = PBXGroup;
 			children = (
+				FAF290532485720B0031CEA7 /* PostGrotesk-Bold.otf */,
 				FA3806552482AC9C0073D6EA /* Assets.xcassets */,
 				FA3806572482AC9C0073D6EA /* LaunchScreen.storyboard */,
 				FA38065A2482AC9C0073D6EA /* Info.plist */,
@@ -106,6 +116,16 @@
 				FA3806682482C25B0073D6EA /* LayoutHelper.swift */,
 			);
 			path = Helpers;
+			sourceTree = "<group>";
+		};
+		FA91DB1224845805009C2B21 /* Preview */ = {
+			isa = PBXGroup;
+			children = (
+				FA91DB132484581D009C2B21 /* PreviewViewController.swift */,
+				FAF2904F248571950031CEA7 /* FilterCarousel.swift */,
+				FAF29051248571BF0031CEA7 /* FilterModel.swift */,
+			);
+			path = Preview;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -166,6 +186,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FAF290542485720B0031CEA7 /* PostGrotesk-Bold.otf in Resources */,
 				FA3806592482AC9C0073D6EA /* LaunchScreen.storyboard in Resources */,
 				FA3806562482AC9C0073D6EA /* Assets.xcassets in Resources */,
 			);
@@ -179,12 +200,15 @@
 			buildActionMask = 2147483647;
 			files = (
 				FA3806512482AC9A0073D6EA /* RecordingViewController.swift in Sources */,
+				FAF29050248571950031CEA7 /* FilterCarousel.swift in Sources */,
 				FA38066B2482E3930073D6EA /* RecordingManager.swift in Sources */,
 				FA3806692482C25B0073D6EA /* LayoutHelper.swift in Sources */,
 				FA3806642482C1FF0073D6EA /* RecordingButton.swift in Sources */,
+				FAF29052248571BF0031CEA7 /* FilterModel.swift in Sources */,
 				FA3806672482C24A0073D6EA /* CAHelper.swift in Sources */,
 				FA38064D2482AC9A0073D6EA /* AppDelegate.swift in Sources */,
 				FA38064F2482AC9A0073D6EA /* SceneDelegate.swift in Sources */,
+				FA91DB142484581D009C2B21 /* PreviewViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
