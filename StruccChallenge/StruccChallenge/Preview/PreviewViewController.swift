@@ -7,9 +7,11 @@
 //
 
 import UIKit
+import AVFoundation
 
 class PreviewViewController: UIViewController {
     //MARK:- Vars
+    var previewManager: PreviewManager?
     
     //MARK:- View Components
     fileprivate let carouselView = FilterCarouselView(withModel: [])
@@ -19,6 +21,7 @@ class PreviewViewController: UIViewController {
         super.viewDidLoad()
         setupView()
         setupCarouselFilters()
+        setupManager()
     }
     
     //MARK:- Setup
@@ -44,5 +47,30 @@ class PreviewViewController: UIViewController {
             FilterModel(image: UIImage(named: "ThumbInstant"), displayName: "Instant", filterName: "CIPhotoEffectInstant"),
         ]
         carouselView.model = model
+    }
+    
+    fileprivate func setupManager(){
+        previewManager = PreviewManager()
+        previewManager?.delegate = self
+        previewManager?.start()
+    }
+    
+    fileprivate func addPlayerLayer(_ playerLayer: AVPlayerLayer) {
+        view.layer.insertSublayer(playerLayer, below: carouselView.layer)
+        playerLayer.frame = view.layer.frame
+    }
+}
+
+extension PreviewViewController : PreviewManagerDelegate {
+    func previewStarted(_ manager: PreviewManager) {
+        
+    }
+    
+    func previewLayerReady(playerLayer: AVPlayerLayer, _ manager: PreviewManager) {
+        addPlayerLayer(playerLayer)
+    }
+    
+    func previewError(_ manager: PreviewManager) {
+        
     }
 }
