@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		FA0FE35924870F9400A579BA /* PreviewManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0FE35824870F9400A579BA /* PreviewManager.swift */; };
+		FA0FE35B2487176100A579BA /* CustomCompositor.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA0FE35A2487176100A579BA /* CustomCompositor.swift */; };
 		FA38064D2482AC9A0073D6EA /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA38064C2482AC9A0073D6EA /* AppDelegate.swift */; };
 		FA38064F2482AC9A0073D6EA /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA38064E2482AC9A0073D6EA /* SceneDelegate.swift */; };
 		FA3806512482AC9A0073D6EA /* RecordingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA3806502482AC9A0073D6EA /* RecordingViewController.swift */; };
@@ -25,6 +26,7 @@
 
 /* Begin PBXFileReference section */
 		FA0FE35824870F9400A579BA /* PreviewManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewManager.swift; sourceTree = "<group>"; };
+		FA0FE35A2487176100A579BA /* CustomCompositor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCompositor.swift; sourceTree = "<group>"; };
 		FA3806492482AC9A0073D6EA /* StruccChallenge.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StruccChallenge.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA38064C2482AC9A0073D6EA /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		FA38064E2482AC9A0073D6EA /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -127,6 +129,7 @@
 				FAF2904F248571950031CEA7 /* FilterCarousel.swift */,
 				FAF29051248571BF0031CEA7 /* FilterModel.swift */,
 				FA0FE35824870F9400A579BA /* PreviewManager.swift */,
+				FA0FE35A2487176100A579BA /* CustomCompositor.swift */,
 			);
 			path = Preview;
 			sourceTree = "<group>";
@@ -209,6 +212,7 @@
 				FA3806692482C25B0073D6EA /* LayoutHelper.swift in Sources */,
 				FA3806642482C1FF0073D6EA /* RecordingButton.swift in Sources */,
 				FAF29052248571BF0031CEA7 /* FilterModel.swift in Sources */,
+				FA0FE35B2487176100A579BA /* CustomCompositor.swift in Sources */,
 				FA3806672482C24A0073D6EA /* CAHelper.swift in Sources */,
 				FA38064D2482AC9A0073D6EA /* AppDelegate.swift in Sources */,
 				FA38064F2482AC9A0073D6EA /* SceneDelegate.swift in Sources */,

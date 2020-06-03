@@ -20,6 +20,7 @@ protocol PreviewManagerDelegate : AnyObject {
     func previewError(_ manager: PreviewManager)
 }
 
+/* handles creating an AVComposition from the 2 videos recorded in the recording scene and playing them */
 class PreviewManager: NSObject {
     //MARK:- Vars
     public weak var delegate : PreviewManagerDelegate?
@@ -166,6 +167,7 @@ class PreviewManager: NSObject {
         videoComposition.frameDuration = CMTime(value: 1, timescale: 30)
         videoComposition.renderSize = CGSize(width: 1080, height: 1920)
         videoComposition.renderScale = 1.0
+        videoComposition.customVideoCompositorClass = CustomCompositor.self
         return videoComposition
     }
     
@@ -191,8 +193,14 @@ class PreviewManager: NSObject {
         }
     }
     
+    //MARK:- Notification Handlers
     @objc func playerItemDidReachEnd(notification: NSNotification) {
         player?.seek(to: .zero)
         player?.play()
+    }
+    
+    //MARK:- Deinit
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
 }
