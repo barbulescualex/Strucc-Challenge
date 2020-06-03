@@ -29,10 +29,11 @@ class PreviewManager: NSObject {
     fileprivate var player : AVPlayer?
     
     //track IDs
-    static let videoTrack1ID = CMPersistentTrackID(1)
-    static let audioTrack1ID = CMPersistentTrackID(2)
-    static let videoTrack2ID = CMPersistentTrackID(3)
-    static let audioTrack2ID = CMPersistentTrackID(4)
+    static let foregroundVideoTrackID = CMPersistentTrackID(1)
+    static let foregroundAudioTrackID = CMPersistentTrackID(2)
+    
+    static let backgroundVideoTrackID = CMPersistentTrackID(3)
+    static let backgroundAudioTrackID = CMPersistentTrackID(4)
     
     //MARK:- Setup
     public func start(){
@@ -43,12 +44,12 @@ class PreviewManager: NSObject {
             //get the 2 urls
             let directory = FileManager.default.temporaryDirectory
 
-            let url1 = directory.appendingPathComponent("video1.mp4")
-            let url2 = directory.appendingPathComponent("video2.mp4")
+            let foregroundURL = directory.appendingPathComponent("video1.mp4")
+            let backgroundURL = directory.appendingPathComponent("video2.mp4")
 
             //get asset representation for the 2 videos
-            let foregroundAsset = AVAsset(url: url1)
-            let backgroundAsset = AVAsset(url: url2)
+            let foregroundAsset = AVAsset(url: foregroundURL)
+            let backgroundAsset = AVAsset(url: backgroundURL)
 
             //check that the assets are composable
             if !foregroundAsset.isComposable {
@@ -64,7 +65,7 @@ class PreviewManager: NSObject {
             }
 
             //make composition from the 2 assets
-            guard let composition = self.makeComposition(from: foregroundAsset, asset2: backgroundAsset) else {return}
+            guard let composition = self.makeComposition(from: foregroundAsset, backgroundAsset: backgroundAsset) else {return}
 
             //make video composition
             let videoCompostion = self.makeVideoComposition(fromComposition: composition)
@@ -75,21 +76,21 @@ class PreviewManager: NSObject {
     }
     
     /* returns a composition with both the video and audio tracks from both assets */
-    fileprivate func makeComposition(from asset1: AVAsset, asset2: AVAsset) -> AVMutableComposition? {
+    fileprivate func makeComposition(from foregroundAsset: AVAsset, backgroundAsset: AVAsset) -> AVMutableComposition? {
         //create composition
         let composition = AVMutableComposition()
         
         //find time duration
-        let timeDuration = asset1.duration > asset2.duration ? asset2.duration : asset1.duration
+        let timeDuration = foregroundAsset.duration > backgroundAsset.duration ? backgroundAsset.duration : foregroundAsset.duration
 
         //male time range
         let timeRange = CMTimeRangeMake(start: .zero, duration: timeDuration)
 
         //place wanted tracks from the 2 videos inside composition
         
-        //video track 1
-        guard let videoTrack1 = composition.addMutableTrack(withMediaType: .video, preferredTrackID: PreviewManager.videoTrack1ID) else {
-            print("couldn't make videoTrack1")
+        //foreground video track
+        guard let foregroundVideoTrack = composition.addMutableTrack(withMediaType: .video, preferredTrackID: PreviewManager.foregroundVideoTrackID) else {
+            print("couldn't make foregroundVideoTrack")
             DispatchQueue.main.async {
                 self.delegate?.previewError(self)
             }
@@ -98,53 +99,34 @@ class PreviewManager: NSObject {
         
         do {
             //fine if call to tracks on asset blocks, thread has nothing else to do until the track is available
-            try videoTrack1.insertTimeRange(timeRange, of: asset1.tracks(withMediaType: .video)[0], at: .zero)
+            try foregroundVideoTrack.insertTimeRange(timeRange, of: foregroundAsset.tracks(withMediaType: .video)[0], at: .zero)
         } catch {
-            print("failed to load videoTrack1 with error: ", error.localizedDescription)
+            print("failed to load foregroundVideoTrack with error: ", error.localizedDescription)
             DispatchQueue.main.async {
                 self.delegate?.previewError(self)
             }
             return nil
         }
 
-        //video track 2
-        guard let videoTrack2 = composition.addMutableTrack(withMediaType: .video, preferredTrackID: PreviewManager.videoTrack2ID) else {
-            print("coudln't make videoTrack2")
+        //background video track
+        guard let backgroundVideoTrack = composition.addMutableTrack(withMediaType: .video, preferredTrackID: PreviewManager.backgroundVideoTrackID) else {
+            print("coudln't make backgroundVideoTrack")
             return nil
         }
 
         do {
-            try videoTrack2.insertTimeRange(timeRange, of: asset2.tracks(withMediaType: .video)[0], at: .zero)
+            try backgroundVideoTrack.insertTimeRange(timeRange, of: backgroundAsset.tracks(withMediaType: .video)[0], at: .zero)
         } catch {
-            print("failed to load videoTrack2 with error: ", error.localizedDescription)
+            print("failed to load backgroundVideoTrack with error: ", error.localizedDescription)
             DispatchQueue.main.async {
                 self.delegate?.previewError(self)
             }
             return nil
         }
 
-        //audio track 1
-        guard let audioTrack1 = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: PreviewManager.audioTrack1ID) else {
-            print("coudln't make audioTrack1")
-            DispatchQueue.main.async {
-                self.delegate?.previewError(self)
-            }
-            return nil
-        }
-
-        do {
-            try audioTrack1.insertTimeRange(timeRange, of: asset1.tracks(withMediaType: .audio)[0], at: .zero)
-        } catch {
-            print("failed to load audioTrack1 with error: ", error.localizedDescription)
-            DispatchQueue.main.async {
-                self.delegate?.previewError(self)
-            }
-            print("failed to load audioTrack1 with error: ", error.localizedDescription)
-        }
-
-        //audio track 2
-        guard let audioTrack2 = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: PreviewManager.audioTrack2ID) else {
-            print("coudln't make audioTrack2")
+        //foreground audio track
+        guard let foregroundAudioTrack = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: PreviewManager.foregroundAudioTrackID) else {
+            print("coudln't make foregroundAudioTrack")
             DispatchQueue.main.async {
                 self.delegate?.previewError(self)
             }
@@ -152,9 +134,27 @@ class PreviewManager: NSObject {
         }
 
         do {
-            try audioTrack2.insertTimeRange(timeRange, of: asset2.tracks(withMediaType: .audio)[0], at: .zero)
+            try foregroundAudioTrack.insertTimeRange(timeRange, of: foregroundAsset.tracks(withMediaType: .audio)[0], at: .zero)
         } catch {
-            print("failed to load audioTrack2 with error: ", error.localizedDescription)
+            print("failed to load foregroundAudioTrack with error: ", error.localizedDescription)
+            DispatchQueue.main.async {
+                self.delegate?.previewError(self)
+            }
+        }
+
+        //background audio track
+        guard let backgroundAudioTrack = composition.addMutableTrack(withMediaType: .audio, preferredTrackID: PreviewManager.backgroundAudioTrackID) else {
+            print("coudln't make backgroundAudioTrack")
+            DispatchQueue.main.async {
+                self.delegate?.previewError(self)
+            }
+            return nil
+        }
+
+        do {
+            try backgroundAudioTrack.insertTimeRange(timeRange, of: backgroundAsset.tracks(withMediaType: .audio)[0], at: .zero)
+        } catch {
+            print("failed to load backgroundAudioTrack with error: ", error.localizedDescription)
             DispatchQueue.main.async {
                 self.delegate?.previewError(self)
             }

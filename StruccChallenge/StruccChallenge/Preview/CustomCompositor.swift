@@ -59,18 +59,18 @@ class CustomCompositor : NSObject, AVVideoCompositing {
         
         //make sure we have input buffers from the source frames and output buffer for the final frame
         guard let resultingPixelBuffer = request.renderContext.newPixelBuffer() else { request.finishCancelledRequest(); return}
-        guard let backgroundPixelBuffer = request.sourceFrame(byTrackID: PreviewManager.videoTrack2ID) else { request.finishCancelledRequest(); return}
-        guard let foregorundPixelBuffer = request.sourceFrame(byTrackID: PreviewManager.videoTrack1ID) else { request.finishCancelledRequest(); return}
+        guard let backgroundPixelBuffer = request.sourceFrame(byTrackID: PreviewManager.backgroundVideoTrackID) else { request.finishCancelledRequest(); return}
+        guard let foregroundPixelBuffer = request.sourceFrame(byTrackID: PreviewManager.foregroundVideoTrackID) else { request.finishCancelledRequest(); return}
         
         //lock buffers
-        lockBuffersToReadyOnly(pixelBuffers: [backgroundPixelBuffer, foregorundPixelBuffer])
+        lockBuffersToReadyOnly(pixelBuffers: [backgroundPixelBuffer, foregroundPixelBuffer])
         
         //create CIImages from the respective video frames
         var backgroundCIImage = CIImage(cvImageBuffer: backgroundPixelBuffer)
-        var foregroundCIImage = CIImage(cvImageBuffer: foregorundPixelBuffer)
+        var foregroundCIImage = CIImage(cvImageBuffer: foregroundPixelBuffer)
         
         //unlock buffers
-        unlockBuffersFromReadOnly(pixelBuffers: [backgroundPixelBuffer, foregorundPixelBuffer])
+        unlockBuffersFromReadOnly(pixelBuffers: [backgroundPixelBuffer, foregroundPixelBuffer])
         
         //apply alpha to foreground image
         alphaFilter.setValue(foregroundCIImage, forKey: kCIInputImageKey)
