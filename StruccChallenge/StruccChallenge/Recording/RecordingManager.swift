@@ -37,7 +37,7 @@ class RecordingManager : NSObject {
     fileprivate var captureSession : AVCaptureSession!
     
     //callback queue
-    let avQueue = DispatchQueue(label: "ca.alexs.av-queue", qos: .userInitiated)
+    fileprivate let avQueue = DispatchQueue(label: "ca.alexs.av-queue", qos: .userInitiated)
     
     //MARK: Capture Session Vars
     //cameras
@@ -375,6 +375,14 @@ class RecordingManager : NSObject {
                 }
             }
         }
+    }
+    
+    public func stopSession(){
+        captureSession.stopRunning()
+    }
+    
+    public func startSession(){
+        captureSession.startRunning()
     }
     
     //MARK:- Notifications

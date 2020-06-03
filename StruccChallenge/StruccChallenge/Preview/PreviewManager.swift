@@ -36,6 +36,9 @@ class PreviewManager: NSObject {
     
     //MARK:- Setup
     public func start(){
+        //reset current filter singleton incase this is a new preview session
+        CurrentFilter.shared.filter = nil
+        
         DispatchQueue.global(qos: .userInteractive).async {
             //get the 2 urls
             let directory = FileManager.default.temporaryDirectory
@@ -205,6 +208,10 @@ class PreviewManager: NSObject {
         }
     }
     
+    public func pause(){
+//        player?.pause()
+    }
+    
     //MARK:- Notification Handlers
     @objc func playerItemDidReachEnd(notification: NSNotification) {
         player?.seek(to: .zero)
@@ -213,6 +220,8 @@ class PreviewManager: NSObject {
     
     //MARK:- Deinit
     deinit {
+        //player item has a strong reference to the Custom Compositor which leads to a memory leak
+        player?.replaceCurrentItem(with: nil)
         NotificationCenter.default.removeObserver(self)
     }
 }

@@ -11,10 +11,19 @@ import AVFoundation
 
 class PreviewViewController: UIViewController {
     //MARK:- Vars
-    var previewManager: PreviewManager?
+    fileprivate var previewManager: PreviewManager?
     
     //MARK:- View Components
     fileprivate let carouselView = FilterCarouselView(withModel: [])
+    
+    fileprivate let cancelButton : UIButton = {
+        let button = UIButton()
+        let image = UIImage(named: "Exit")
+        button.setImage(image, for: .normal)
+        button.tintColor = .white
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
     
     //MARK:- Lifecycle
     override func viewDidLoad() {
@@ -37,6 +46,15 @@ class PreviewViewController: UIViewController {
             carouselView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             carouselView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.25)
         ])
+        
+        //cancel button
+        view.addSubview(cancelButton)
+        NSLayoutConstraint.activate([
+            cancelButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 12),
+            cancelButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -12)
+        ])
+        
+        cancelButton.addTarget(self, action: #selector(cancelTapped(_:)), for: .touchUpInside)
     }
     
     fileprivate func setupCarouselFilters(){
@@ -56,10 +74,19 @@ class PreviewViewController: UIViewController {
         previewManager?.start()
     }
     
+    //MARK:- Actions
+    @objc fileprivate func cancelTapped(_ sender: UIButton) {
+        //pause the player so the audio doesn't continue until the manager is deallocated
+        previewManager?.pause()
+        self.dismiss(animated: true, completion: nil)
+    }
+    
+    //MARK:- Functions
     fileprivate func addPlayerLayer(_ playerLayer: AVPlayerLayer) {
         view.layer.insertSublayer(playerLayer, below: carouselView.layer)
         playerLayer.frame = view.layer.frame
     }
+    
 }
 
 //MARK:- PreviewManagerDelegate

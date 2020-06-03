@@ -178,6 +178,7 @@ class FilterCarouselView: UIView {
     
     fileprivate func updateCarousel(toIndex index: Int){
         if index >= model.count || index < 0 || index == currentFilterIndex { return } //out of bounds
+        delegate?.didSelectModel(model: model[index], view: self)
         
         var newStartPos = 2 - index
         
@@ -194,7 +195,6 @@ class FilterCarouselView: UIView {
         currentFilterIndex = index
         startPos = newStartPos
         
-        delegate?.didSelectModel(model: model[currentFilterIndex], view: self)
         updateView()
     }
     

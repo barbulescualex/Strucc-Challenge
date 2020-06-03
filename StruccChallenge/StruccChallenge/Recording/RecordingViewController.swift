@@ -16,6 +16,8 @@ class RecordingViewController: UIViewController {
     
     fileprivate var videoNumber = 0
     
+    fileprivate var firstLoad = true
+    
     //MARK:- View Components
     fileprivate let recordingButton = RecordingButton(withSize: 74)
     
@@ -35,6 +37,21 @@ class RecordingViewController: UIViewController {
         super.viewDidLoad()
         setupView()
         checkPermissions()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        if firstLoad {
+            firstLoad = false
+            return
+        }
+        //will trigger sessionStarted callback which will then start the writer which will then enable the UI
+        recordingManager?.startSession()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        recordingManager?.stopSession()
     }
     
     //MARK:- Setup
@@ -57,10 +74,10 @@ class RecordingViewController: UIViewController {
         view.addSubview(switchCameraButton)
         
         NSLayoutConstraint.activate([
-            switchCameraButton.heightAnchor.constraint(equalToConstant: 24.6),
-            switchCameraButton.widthAnchor.constraint(equalToConstant: 22),
-            switchCameraButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 24),
-            switchCameraButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -25)
+            switchCameraButton.heightAnchor.constraint(equalToConstant: 25),
+            switchCameraButton.widthAnchor.constraint(equalToConstant: 24),
+            switchCameraButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
+            switchCameraButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -19)
         ])
         
         switchCameraButton.isUserInteractionEnabled = false
@@ -143,8 +160,9 @@ extension RecordingViewController : RecordingButtonDelegate {
 //MARK:- AVManagerDelegate
 extension RecordingViewController : RecordingDelegate {
     func writerReady(manager: RecordingManager) {
-        //enable recording, writer is ready so users can record
+        //enable recording, writer is ready so users can record, they can also flip camera before recording
         recordingButton.isUserInteractionEnabled = true
+        switchCameraButton.isUserInteractionEnabled = true
     }
     
     func writerError(manager: RecordingManager) {
@@ -162,7 +180,7 @@ extension RecordingViewController : RecordingDelegate {
             previewVC.modalPresentationStyle = .fullScreen
             previewVC.modalTransitionStyle = .crossDissolve
             self.present(previewVC, animated: true) {
-                //stop camera session..
+                self.videoNumber = 0
             }
         }
     }
