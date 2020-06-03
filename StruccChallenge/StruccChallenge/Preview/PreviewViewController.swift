@@ -25,6 +25,8 @@ class PreviewViewController: UIViewController {
         return button
     }()
     
+    fileprivate var playerLayer : AVPlayerLayer?
+    
     //MARK:- Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -46,6 +48,7 @@ class PreviewViewController: UIViewController {
             carouselView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             carouselView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.25)
         ])
+        carouselView.isUserInteractionEnabled = false
         
         //cancel button
         view.addSubview(cancelButton)
@@ -85,6 +88,7 @@ class PreviewViewController: UIViewController {
     fileprivate func addPlayerLayer(_ playerLayer: AVPlayerLayer) {
         view.layer.insertSublayer(playerLayer, below: carouselView.layer)
         playerLayer.frame = view.layer.frame
+        self.playerLayer = playerLayer
     }
     
 }
@@ -92,7 +96,7 @@ class PreviewViewController: UIViewController {
 //MARK:- PreviewManagerDelegate
 extension PreviewViewController : PreviewManagerDelegate {
     func previewStarted(_ manager: PreviewManager) {
-        
+        carouselView.isUserInteractionEnabled = true
     }
     
     func previewLayerReady(playerLayer: AVPlayerLayer, _ manager: PreviewManager) {
@@ -100,7 +104,20 @@ extension PreviewViewController : PreviewManagerDelegate {
     }
     
     func previewError(_ manager: PreviewManager) {
-        
+        let warning = UIAlertController(title: "Ooops", message: "Couldn't load your videos", preferredStyle: .alert)
+        warning.addAction(UIAlertAction(title: "Try again", style: .default, handler: { [weak self] _ in
+            guard let self = self else {return}
+           
+            //deallocate recording manager, try process again
+            self.previewManager = nil
+           
+            //remove preview layer (if there)
+            self.playerLayer?.removeFromSuperlayer()
+           
+            //restart manager
+            self.setupManager()
+        }))
+        self.present(warning, animated: true, completion: nil)
     }
 }
 

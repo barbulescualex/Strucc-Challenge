@@ -184,7 +184,7 @@ class PreviewManager: NSObject {
         player = AVPlayer(playerItem: playerItem)
         
         //subscribe to end notification
-        NotificationCenter.default.addObserver(self, selector: #selector(playerItemDidReachEnd(notification:)), name: .AVPlayerItemDidPlayToEndTime, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(playerItemDidReachEnd(_:)), name: .AVPlayerItemDidPlayToEndTime, object: nil)
         
         //get layer and pass to delegate
         let playerLayer = AVPlayerLayer(player: player)
@@ -193,6 +193,7 @@ class PreviewManager: NSObject {
             self.delegate?.previewLayerReady(playerLayer: playerLayer, self)
             //start playing after delegate adds layer as sublayer
             self.player?.play()
+            self.delegate?.previewStarted(self)
         }
     }
     //MARK:- Functions
@@ -209,11 +210,11 @@ class PreviewManager: NSObject {
     }
     
     public func pause(){
-//        player?.pause()
+        player?.pause()
     }
     
     //MARK:- Notification Handlers
-    @objc func playerItemDidReachEnd(notification: NSNotification) {
+    @objc fileprivate func playerItemDidReachEnd(_ notification: NSNotification) {
         player?.seek(to: .zero)
         player?.play()
     }
