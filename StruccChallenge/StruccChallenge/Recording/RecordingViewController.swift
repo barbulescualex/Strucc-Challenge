@@ -166,7 +166,18 @@ extension RecordingViewController : RecordingDelegate {
     }
     
     func writerError(manager: RecordingManager) {
-        
+        let warning = UIAlertController(title: "Ooops", message: "Couldn't write to disk!", preferredStyle: .alert)
+        warning.addAction(UIAlertAction(title: "Try again", style: .default, handler: { [weak self] _ in
+            guard let self = self else {return}
+           
+            //deallocate recording manager, try process again
+            self.recordingManager = nil
+           
+            //remove preview layer (if there)
+            self.previewLayer?.removeFromSuperlayer()
+           
+            self.setupRecordingManager()
+        }))
     }
     
     func writerFinished(manager: RecordingManager) {
