@@ -99,7 +99,11 @@ class PreviewManager: NSObject {
         
         do {
             //fine if call to tracks on asset blocks, thread has nothing else to do until the track is available
-            try foregroundVideoTrack.insertTimeRange(timeRange, of: foregroundAsset.tracks(withMediaType: .video)[0], at: .zero)
+            if let assetTrack = foregroundAsset.tracks(withMediaType: .video).first {
+                try foregroundVideoTrack.insertTimeRange(timeRange, of: assetTrack, at: .zero)
+            } else {
+                throw NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey : "no asset track"])
+            }
         } catch {
             print("failed to load foregroundVideoTrack with error: ", error.localizedDescription)
             DispatchQueue.main.async {
@@ -115,7 +119,11 @@ class PreviewManager: NSObject {
         }
 
         do {
-            try backgroundVideoTrack.insertTimeRange(timeRange, of: backgroundAsset.tracks(withMediaType: .video)[0], at: .zero)
+            if let assetTrack = backgroundAsset.tracks(withMediaType: .video).first {
+                 try backgroundVideoTrack.insertTimeRange(timeRange, of: assetTrack, at: .zero)
+            } else {
+                throw NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey : "no asset track"])
+            }
         } catch {
             print("failed to load backgroundVideoTrack with error: ", error.localizedDescription)
             DispatchQueue.main.async {
@@ -134,7 +142,11 @@ class PreviewManager: NSObject {
         }
 
         do {
-            try foregroundAudioTrack.insertTimeRange(timeRange, of: foregroundAsset.tracks(withMediaType: .audio)[0], at: .zero)
+            if let assetTrack = foregroundAsset.tracks(withMediaType: .audio).first {
+                try foregroundAudioTrack.insertTimeRange(timeRange, of: assetTrack, at: .zero)
+            } else {
+                throw NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey : "no asset track"])
+            }
         } catch {
             print("failed to load foregroundAudioTrack with error: ", error.localizedDescription)
             DispatchQueue.main.async {
@@ -152,7 +164,11 @@ class PreviewManager: NSObject {
         }
 
         do {
-            try backgroundAudioTrack.insertTimeRange(timeRange, of: backgroundAsset.tracks(withMediaType: .audio)[0], at: .zero)
+            if let assetTrack = backgroundAsset.tracks(withMediaType: .audio).first {
+                try backgroundAudioTrack.insertTimeRange(timeRange, of: assetTrack, at: .zero)
+            } else {
+                throw NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey : "no asset track"])
+            }
         } catch {
             print("failed to load backgroundAudioTrack with error: ", error.localizedDescription)
             DispatchQueue.main.async {
