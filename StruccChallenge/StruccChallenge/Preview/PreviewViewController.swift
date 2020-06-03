@@ -41,12 +41,13 @@ class PreviewViewController: UIViewController {
     
     fileprivate func setupCarouselFilters(){
         let model = [
-            FilterModel(image: UIImage(named: "ThumbNoFilter"), displayName: "No Filter", filterName: "none"),
+            FilterModel(image: UIImage(named: "ThumbNoFilter"), displayName: "No Filter", filterName: nil),
             FilterModel(image: UIImage(named: "ThumbNoir"), displayName: "Noir", filterName: "CIPhotoEffectNoir"),
             FilterModel(image: UIImage(named: "ThumbChrome"), displayName: "Chrome", filterName: "CIPhotoEffectChrome"),
             FilterModel(image: UIImage(named: "ThumbInstant"), displayName: "Instant", filterName: "CIPhotoEffectInstant"),
         ]
         carouselView.model = model
+        carouselView.delegate = self
     }
     
     fileprivate func setupManager(){
@@ -61,6 +62,7 @@ class PreviewViewController: UIViewController {
     }
 }
 
+//MARK:- PreviewManagerDelegate
 extension PreviewViewController : PreviewManagerDelegate {
     func previewStarted(_ manager: PreviewManager) {
         
@@ -73,4 +75,12 @@ extension PreviewViewController : PreviewManagerDelegate {
     func previewError(_ manager: PreviewManager) {
         
     }
+}
+
+//MARK:- FilterCarouselViewDelegate
+extension PreviewViewController : FilterCarouselViewDelegate {
+    func didSelectModel(model: FilterModel, view: FilterCarouselView) {
+        previewManager?.changeFilterTo(filterWithName: model.filterName)
+    }
+    
 }

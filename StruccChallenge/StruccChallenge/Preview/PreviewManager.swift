@@ -192,6 +192,18 @@ class PreviewManager: NSObject {
             self.player?.play()
         }
     }
+    //MARK:- Functions
+    public func changeFilterTo(filterWithName name: String?) {
+        if let name = name {
+            if let filter = CIFilter(name: name) {
+                CurrentFilter.shared.filter = filter
+            } else {
+                self.delegate?.previewError(self)
+            }
+        } else { //no filter
+            CurrentFilter.shared.filter = nil
+        }
+    }
     
     //MARK:- Notification Handlers
     @objc func playerItemDidReachEnd(notification: NSNotification) {
@@ -203,4 +215,13 @@ class PreviewManager: NSObject {
     deinit {
         NotificationCenter.default.removeObserver(self)
     }
+}
+
+//MARK:- Current Filter Singleton
+
+/* singleton that the CustomCompositor can access to get the current filter that it should apply */
+class CurrentFilter: NSObject {
+    static let shared = CurrentFilter()
+    
+    public var filter : CIFilter?
 }

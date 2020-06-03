@@ -15,10 +15,13 @@ class CustomCompositor : NSObject, AVVideoCompositing {
     var sourcePixelBufferAttributes: [String : Any]? = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA]
     var requiredPixelBufferAttributesForRenderContext: [String : Any] = [kCVPixelBufferPixelFormatTypeKey as String: kCVPixelFormatType_32BGRA]
     
-    //filters
-    fileprivate let filter = CIFilter(name: "CIComicEffect")
+    //alpha filter to apply to foreground video
     fileprivate let alphaFilter = CIFilter(name: "CIColorMatrix")
+    
+    //context to use core image functions with
     fileprivate var context: CIContext?
+    
+    //transform to apply to foreground video
     fileprivate var transform : CGAffineTransform?
     
     //MARK:- Init
@@ -52,7 +55,7 @@ class CustomCompositor : NSObject, AVVideoCompositing {
     
     func startRequest(_ request: AVAsynchronousVideoCompositionRequest) {
         //make sure the necessary tools to adjust the foreground and use Core Image are present
-        guard let filter = filter, let transform = transform, let alphaFilter = alphaFilter, let context = context else { request.finishCancelledRequest(); return }
+        guard let transform = transform, let alphaFilter = alphaFilter, let context = context else { request.finishCancelledRequest(); return }
         
         //make sure we have input buffers from the source frames and output buffer for the final frame
         guard let resultingPixelBuffer = request.renderContext.newPixelBuffer() else { request.finishCancelledRequest(); return}
@@ -78,10 +81,12 @@ class CustomCompositor : NSObject, AVVideoCompositing {
         //apply transform to foreground image
         foregroundCIImage = foregroundCIImage.transformed(by: transform)
         
-        //apply filter to background image
-        filter.setValue(backgroundCIImage, forKey: kCIInputImageKey)
-        if let filteredBackgroundCIImage = filter.outputImage {
-            backgroundCIImage = filteredBackgroundCIImage
+        //apply filter to background image (if present)
+        if let filterToApply = CurrentFilter.shared.filter {
+            filterToApply.setValue(backgroundCIImage, forKey: kCIInputImageKey)
+            if let filteredBackgroundCIImage = filterToApply.outputImage {
+                backgroundCIImage = filteredBackgroundCIImage
+            }
         }
         
         //create final frame
