@@ -75,6 +75,8 @@ class PreviewViewController: UIViewController {
         ])
         carouselView.isUserInteractionEnabled = false
         carouselView.alpha = 0
+        carouselView.currentFilterView.alpha = 0
+        carouselView.currentFilterLabel.alpha = 0
         
         view.addSubview(carouselView.currentFilterView)
         view.addSubview(carouselView.currentFilterLabel)
@@ -147,6 +149,8 @@ class PreviewViewController: UIViewController {
             UIView.animate(withDuration: 0.15, animations: {
                 self.recordingButton.alpha = 0
                 self.carouselView.alpha = 1
+                self.carouselView.currentFilterView.alpha = 1
+                self.carouselView.currentFilterLabel.alpha = 1
                 for iv in self.carouselView.imageViews {
                     iv.alpha = 1
                 }
