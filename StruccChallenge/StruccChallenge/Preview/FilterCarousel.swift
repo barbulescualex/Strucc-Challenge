@@ -77,14 +77,14 @@ class FilterCarouselView: UIView {
     fileprivate func setupView(){
         translatesAutoresizingMaskIntoConstraints = false
         
-        //create the 5 image views which house the filter preview images and set them up
-        for i in 0..<5 {
+        //create the 7 image views which house the filter preview images and set them up, 5 visible, 2 off screen and used for transitions
+        for i in 0..<7 {
             let imageView = UIImageView()
             imageView.translatesAutoresizingMaskIntoConstraints = false
             imageView.tag = i
             imageView.contentMode = .scaleAspectFill
             imageViews.append(imageView)
-            if i != 2 {
+            if i != 3 {
                 addSubview(imageView)
                 NSLayoutConstraint.activate([
                     imageView.widthAnchor.constraint(equalToConstant: 42),
@@ -114,10 +114,10 @@ class FilterCarouselView: UIView {
             currentFilterLabel.topAnchor.constraint(equalTo: currentFilterView.bottomAnchor, constant: 20)
         ])
         
-        currentFilterView.addSubview(imageViews[2])
-        NSLayoutConstraint.constrain(firstView: imageViews[2], toSecondView: currentFilterView, withEqualSpacing: 4)
-        imageViews[2].layer.cornerRadius = (70-4*2)/2
-        imageViews[2].clipsToBounds = true
+        currentFilterView.addSubview(imageViews[3])
+        NSLayoutConstraint.constrain(firstView: imageViews[3], toSecondView: currentFilterView, withEqualSpacing: 4)
+        imageViews[3].layer.cornerRadius = (70-4*2)/2
+        imageViews[3].clipsToBounds = true
         
         //gesture recognizers
         let rightSwipeRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(swipedFilters(_:)))
@@ -138,17 +138,24 @@ class FilterCarouselView: UIView {
         spacingBetweenPreviews = (self.bounds.width/2 - (inactiveFilterViewWidth*2 + halfCurrentFilterViewWidth))/3
 
         NSLayoutConstraint.activate([//from left to right
-            imageViews[0].centerYAnchor.constraint(equalTo: currentFilterView.centerYAnchor),
-            imageViews[0].leadingAnchor.constraint(equalTo: leadingAnchor, constant: spacingBetweenPreviews),
-
             imageViews[1].centerYAnchor.constraint(equalTo: currentFilterView.centerYAnchor),
-            imageViews[1].leadingAnchor.constraint(equalTo: imageViews[0].trailingAnchor, constant: spacingBetweenPreviews),
+            imageViews[1].leadingAnchor.constraint(equalTo: leadingAnchor, constant: spacingBetweenPreviews),
 
-            imageViews[3].centerYAnchor.constraint(equalTo: currentFilterView.centerYAnchor),
-            imageViews[3].leadingAnchor.constraint(equalTo: currentFilterView.trailingAnchor, constant: spacingBetweenPreviews),
+            imageViews[2].centerYAnchor.constraint(equalTo: currentFilterView.centerYAnchor),
+            imageViews[2].leadingAnchor.constraint(equalTo: imageViews[1].trailingAnchor, constant: spacingBetweenPreviews),
 
             imageViews[4].centerYAnchor.constraint(equalTo: currentFilterView.centerYAnchor),
-            imageViews[4].leadingAnchor.constraint(equalTo: imageViews[3].trailingAnchor, constant: spacingBetweenPreviews),
+            imageViews[4].leadingAnchor.constraint(equalTo: currentFilterView.trailingAnchor, constant: spacingBetweenPreviews),
+
+            imageViews[5].centerYAnchor.constraint(equalTo: currentFilterView.centerYAnchor),
+            imageViews[5].leadingAnchor.constraint(equalTo: imageViews[4].trailingAnchor, constant: spacingBetweenPreviews),
+            
+            //image views outside bounds
+            imageViews[0].centerYAnchor.constraint(equalTo: currentFilterView.centerYAnchor),
+            imageViews[0].trailingAnchor.constraint(equalTo: imageViews[1].leadingAnchor, constant: -spacingBetweenPreviews),
+            
+            imageViews[6].centerYAnchor.constraint(equalTo: currentFilterView.centerYAnchor),
+            imageViews[6].leadingAnchor.constraint(equalTo: imageViews[5].trailingAnchor, constant: spacingBetweenPreviews)
         ])
         
         layoutUpdated = true
@@ -161,7 +168,7 @@ class FilterCarouselView: UIView {
         if tag < startPos {return} //out of bounds
         
         //find model idx user is refering to
-        let newFilterIndex = currentFilterIndex - (2 - tag)
+        let newFilterIndex = currentFilterIndex - (3 - tag)
         updateCarousel(toIndex: newFilterIndex)
     }
     
@@ -212,7 +219,7 @@ class FilterCarouselView: UIView {
     }
     
     fileprivate func updatePositions(forIndex index: Int){
-        var newStartPos = 2 - index
+        var newStartPos = 3 - index
                
         if startPos == 0 { //only the model moves it's start position
            modelPos = modelPos + (index - currentFilterIndex)
@@ -221,7 +228,7 @@ class FilterCarouselView: UIView {
 
         if modelPos < 0 { //back to start of model visible
            modelPos = 0
-           newStartPos = 2 - index
+           newStartPos = 3 - index
         }
 
         currentFilterIndex = index
@@ -238,7 +245,7 @@ class FilterCarouselView: UIView {
         }
         while(cpos < 5 && mpos < model.count) {
             let filter = model[mpos]
-            imageViews[cpos].image = filter.image
+            imageViews[cpos+1].image = filter.image
             cpos += 1
             mpos += 1
         }
@@ -249,7 +256,7 @@ class FilterCarouselView: UIView {
         var cpos = startPos //for carousel
         var mpos = modelPos //for model
         
-        let activePreviewWidth = imageViews[2].frame.width
+        let activePreviewWidth = imageViews[3].frame.width
         let inactivePreviewWidth = imageViews[0].frame.width
         
         let scaleFromInactiveToActive = CGFloat(activePreviewWidth)/CGFloat(inactivePreviewWidth)
@@ -268,18 +275,20 @@ class FilterCarouselView: UIView {
         let distanceC = spacingBetweenPreviews + inactivePreviewWidth + delta/2 + borderWidth
         
         UIView.animate(withDuration: duration, animations: {
-            self.imageViews[left ? 4 : 0].transform = CGAffineTransform(translationX: (left ? -1 : 1)*distanceA, y: 0)
-            self.imageViews[left ? 3 : 1].transform = CGAffineTransform(scaleX: scaleFromInactiveToActive, y: scaleFromInactiveToActive).concatenating(CGAffineTransform(translationX: (left ? -1 : 1)*distanceB, y: 0))
-            self.imageViews[2].transform = CGAffineTransform(scaleX: scaleFromActiveToInactive, y: scaleFromActiveToInactive).concatenating( CGAffineTransform(translationX: (left ? -1 : 1)*distanceC, y: 0))
-            self.imageViews[left ? 1 : 3].transform = CGAffineTransform(translationX: (left ? -1 : 1)*distanceA, y: 0)
-            self.imageViews[left ? 0 : 4].transform = CGAffineTransform(translationX: (left ? -1 : 1)*distanceA, y: 0)
+            self.imageViews[left ? 6 : 0].transform = CGAffineTransform(translationX: (left ? -1 : 1)*distanceA, y: 0)
+            self.imageViews[left ? 5 : 1].transform = CGAffineTransform(translationX: (left ? -1 : 1)*distanceA, y: 0)
+            self.imageViews[left ? 4 : 2].transform = CGAffineTransform(scaleX: scaleFromInactiveToActive, y: scaleFromInactiveToActive).concatenating(CGAffineTransform(translationX: (left ? -1 : 1)*distanceB, y: 0))
+            self.imageViews[3].transform = CGAffineTransform(scaleX: scaleFromActiveToInactive, y: scaleFromActiveToInactive).concatenating( CGAffineTransform(translationX: (left ? -1 : 1)*distanceC, y: 0))
+            self.imageViews[left ? 2 : 4].transform = CGAffineTransform(translationX: (left ? -1 : 1)*distanceA, y: 0)
+            self.imageViews[left ? 1 : 5].transform = CGAffineTransform(translationX: (left ? -1 : 1)*distanceA, y: 0)
+            self.imageViews[left ? 0 : 6].transform = CGAffineTransform(translationX: (left ? -1 : 1)*distanceA, y: 0)
             self.layoutIfNeeded()
         }) { _ in
             for iv in self.imageViews {
                 iv.transform = .identity
                 iv.image = nil
             }
-            while(cpos < 5 && mpos < self.model.count) {
+            while(cpos < 7 && mpos < self.model.count) {
                 let filter = self.model[mpos]
                 self.imageViews[cpos].image = filter.image
                     cpos += 1

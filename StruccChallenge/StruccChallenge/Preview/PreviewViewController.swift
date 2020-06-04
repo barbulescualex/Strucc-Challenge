@@ -32,7 +32,7 @@ class PreviewViewController: UIViewController {
         super.viewDidLoad()
         setupView()
         setupCarouselFilters()
-//        setupManager()
+        setupManager()
     }
     
     //MARK:- Setup
@@ -48,7 +48,7 @@ class PreviewViewController: UIViewController {
             carouselView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             carouselView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.25)
         ])
-//        carouselView.isUserInteractionEnabled = false
+        carouselView.isUserInteractionEnabled = false
         
         //cancel button
         view.addSubview(cancelButton)
