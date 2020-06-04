@@ -39,8 +39,11 @@ class FilterCarouselView: UIView {
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .white
         label.font = UIFont(name: "PostGrotesk-Bold", size: 14)
-        label.shadowColor = UIColor(white: 0, alpha: 0.8)
+        label.layer.shadowColor = UIColor.black.cgColor
         label.layer.shadowRadius = 4
+        label.layer.shadowOffset = .zero
+        label.layer.shadowOpacity = 0.8
+//        label.layer.shouldRasterize = true
         return label
     }()
     

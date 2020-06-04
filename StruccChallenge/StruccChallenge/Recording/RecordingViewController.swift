@@ -27,6 +27,10 @@ class RecordingViewController: UIViewController {
         button.setImage(image, for: .normal)
         button.tintColor = .white
         button.translatesAutoresizingMaskIntoConstraints = false
+        button.layer.shadowColor = UIColor.black.cgColor
+        button.layer.shadowRadius = 4
+        button.layer.shadowOffset = .zero
+        button.layer.shadowOpacity = 0.8
         return button
     }()
     
@@ -83,9 +87,9 @@ class RecordingViewController: UIViewController {
         view.addSubview(switchCameraButton)
         
         NSLayoutConstraint.activate([
-            switchCameraButton.heightAnchor.constraint(equalToConstant: 20),
+            switchCameraButton.heightAnchor.constraint(equalToConstant: 22),
             switchCameraButton.widthAnchor.constraint(equalToConstant: 20),
-            switchCameraButton.topAnchor.constraint(equalTo: view.topAnchor, constant: blackBarHeight + 5),
+            switchCameraButton.topAnchor.constraint(equalTo: view.topAnchor, constant: blackBarHeight + 6),
             switchCameraButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10)
         ])
         

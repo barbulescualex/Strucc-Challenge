@@ -22,6 +22,10 @@ class PreviewViewController: UIViewController {
         button.setImage(image, for: .normal)
         button.tintColor = .white
         button.translatesAutoresizingMaskIntoConstraints = false
+        button.layer.shadowColor = UIColor.black.cgColor
+        button.layer.shadowRadius = 4
+        button.layer.shadowOffset = .zero
+        button.layer.shadowOpacity = 0.8
         return button
     }()
     
