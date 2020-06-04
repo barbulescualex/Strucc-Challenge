@@ -32,7 +32,7 @@ class PreviewViewController: UIViewController {
         super.viewDidLoad()
         setupView()
         setupCarouselFilters()
-        setupManager()
+//        setupManager()
     }
     
     //MARK:- Setup
@@ -48,7 +48,7 @@ class PreviewViewController: UIViewController {
             carouselView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             carouselView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.25)
         ])
-        carouselView.isUserInteractionEnabled = false
+//        carouselView.isUserInteractionEnabled = false
         
         //cancel button
         view.addSubview(cancelButton)
@@ -107,15 +107,8 @@ extension PreviewViewController : PreviewManagerDelegate {
         let warning = UIAlertController(title: "Ooops", message: "Couldn't load your videos", preferredStyle: .alert)
         warning.addAction(UIAlertAction(title: "Try again", style: .default, handler: { [weak self] _ in
             guard let self = self else {return}
-           
-            //deallocate recording manager, try process again
-            self.previewManager = nil
-           
-            //remove preview layer (if there)
-            self.playerLayer?.removeFromSuperlayer()
-           
-            //restart manager
-            self.setupManager()
+            //take user back to recording screen
+            self.dismiss(animated: true, completion: nil)
         }))
         self.present(warning, animated: true, completion: nil)
     }

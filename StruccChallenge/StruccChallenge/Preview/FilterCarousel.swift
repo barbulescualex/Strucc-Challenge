@@ -32,6 +32,8 @@ class FilterCarouselView: UIView {
     fileprivate var startPos = 2
     fileprivate var layoutUpdated = false
     
+    fileprivate var spacingBetweenPreviews : CGFloat = 0
+    
     //MARK:- View Components
     private let currentFilterLabel : UILabel = {
         let label = UILabel()
@@ -45,8 +47,10 @@ class FilterCarouselView: UIView {
     
     private let currentFilterView : UIView = {
         let view = UIView()
-        view.backgroundColor = .white
+        view.backgroundColor = .clear
         view.translatesAutoresizingMaskIntoConstraints = false
+        view.layer.borderColor = UIColor.white.cgColor
+        view.layer.borderWidth = 4
         return view
     }()
     
@@ -131,7 +135,7 @@ class FilterCarouselView: UIView {
         //get equal spacing between all the inactive filter views around the center active view
         let halfCurrentFilterViewWidth = currentFilterView.frame.width/2
         let inactiveFilterViewWidth = imageViews[0].frame.width
-        let spacingBetweenPreviews = (self.bounds.width/2 - (inactiveFilterViewWidth*2 + halfCurrentFilterViewWidth))/3
+        spacingBetweenPreviews = (self.bounds.width/2 - (inactiveFilterViewWidth*2 + halfCurrentFilterViewWidth))/3
 
         NSLayoutConstraint.activate([//from left to right
             imageViews[0].centerYAnchor.constraint(equalTo: currentFilterView.centerYAnchor),
@@ -178,30 +182,58 @@ class FilterCarouselView: UIView {
     
     fileprivate func updateCarousel(toIndex index: Int){
         if index >= model.count || index < 0 || index == currentFilterIndex { return } //out of bounds
+        
+        let animateToLeft = index > currentFilterIndex
+        let increment = animateToLeft ? 1 : -1
+        let animationDuration = 0.2/Double(abs(index-currentFilterIndex))
+        
         delegate?.didSelectModel(model: model[index], view: self)
+        self.isUserInteractionEnabled = false
+        updateCarouselHelper(startIndex: currentFilterIndex + increment, increment: increment, targetIndex: index, animationDuration: animationDuration)
+        self.isUserInteractionEnabled = true
+    }
+    
+    fileprivate func updateCarouselHelper(startIndex index: Int, increment: Int, targetIndex: Int, animationDuration: Double){
+        let done = (index == targetIndex)
         
+        let nextIndex = index + increment
+        let animateToLeft = nextIndex > currentFilterIndex
+        
+        updatePositions(forIndex: index)
+        
+        updateViewAnimated(toLeft: animateToLeft, duration: animationDuration) {
+            if done {
+                //update label
+                self.currentFilterLabel.text = self.model[self.currentFilterIndex].displayName
+                return
+            }
+            self.updateCarouselHelper(startIndex: nextIndex, increment: increment, targetIndex: targetIndex, animationDuration: animationDuration)
+        }
+    }
+    
+    fileprivate func updatePositions(forIndex index: Int){
         var newStartPos = 2 - index
-        
+               
         if startPos == 0 { //only the model moves it's start position
-            modelPos = modelPos + (index - currentFilterIndex)
-            newStartPos = 0
+           modelPos = modelPos + (index - currentFilterIndex)
+           newStartPos = 0
         }
-        
+
         if modelPos < 0 { //back to start of model visible
-            modelPos = 0
-            newStartPos = 2 - index
+           modelPos = 0
+           newStartPos = 2 - index
         }
-        
+
         currentFilterIndex = index
         startPos = newStartPos
-        
-        updateView()
     }
     
     fileprivate func updateView(){
         var cpos = startPos //for carousel
         var mpos = modelPos //for model
+        
         for iv in imageViews {
+            iv.transform = .identity
             iv.image = nil
         }
         while(cpos < 5 && mpos < model.count) {
@@ -213,6 +245,49 @@ class FilterCarouselView: UIView {
         currentFilterLabel.text = model[currentFilterIndex].displayName
     }
     
+    fileprivate func updateViewAnimated(toLeft left: Bool, duration: Double, completion: @escaping()->Void){
+        var cpos = startPos //for carousel
+        var mpos = modelPos //for model
+        
+        let activePreviewWidth = imageViews[2].frame.width
+        let inactivePreviewWidth = imageViews[0].frame.width
+        
+        let scaleFromInactiveToActive = CGFloat(activePreviewWidth)/CGFloat(inactivePreviewWidth)
+        let scaleFromActiveToInactive = CGFloat(inactivePreviewWidth)/CGFloat(activePreviewWidth)
+        
+        let delta = activePreviewWidth - inactivePreviewWidth
+        let borderWidth = (currentFilterView.frame.width - activePreviewWidth)/2
+        
+        //distance to travel for inactive to inactive
+        let distanceA = spacingBetweenPreviews + inactivePreviewWidth
+        
+        //distance to travel for inactive to active
+        let distanceB = spacingBetweenPreviews + activePreviewWidth - delta/2 + borderWidth
+        
+        //distance to travel for active to inactive
+        let distanceC = spacingBetweenPreviews + inactivePreviewWidth + delta/2 + borderWidth
+        
+        UIView.animate(withDuration: duration, animations: {
+            self.imageViews[left ? 4 : 0].transform = CGAffineTransform(translationX: (left ? -1 : 1)*distanceA, y: 0)
+            self.imageViews[left ? 3 : 1].transform = CGAffineTransform(scaleX: scaleFromInactiveToActive, y: scaleFromInactiveToActive).concatenating(CGAffineTransform(translationX: (left ? -1 : 1)*distanceB, y: 0))
+            self.imageViews[2].transform = CGAffineTransform(scaleX: scaleFromActiveToInactive, y: scaleFromActiveToInactive).concatenating( CGAffineTransform(translationX: (left ? -1 : 1)*distanceC, y: 0))
+            self.imageViews[left ? 1 : 3].transform = CGAffineTransform(translationX: (left ? -1 : 1)*distanceA, y: 0)
+            self.imageViews[left ? 0 : 4].transform = CGAffineTransform(translationX: (left ? -1 : 1)*distanceA, y: 0)
+            self.layoutIfNeeded()
+        }) { _ in
+            for iv in self.imageViews {
+                iv.transform = .identity
+                iv.image = nil
+            }
+            while(cpos < 5 && mpos < self.model.count) {
+                let filter = self.model[mpos]
+                self.imageViews[cpos].image = filter.image
+                    cpos += 1
+                    mpos += 1
+            }
+            completion()
+        }
+    }
     
 }
 
