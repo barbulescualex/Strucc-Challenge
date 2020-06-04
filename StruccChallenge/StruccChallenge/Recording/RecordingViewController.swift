@@ -19,7 +19,7 @@ class RecordingViewController: UIViewController {
     fileprivate var firstLoad = true
     
     //MARK:- View Components
-    fileprivate let recordingButton = RecordingButton(withSize: 74)
+    fileprivate let recordingButton = RecordingButton(withSize: 70)
     
     fileprivate let switchCameraButton : UIButton = {
         let button = UIButton()
@@ -59,12 +59,21 @@ class RecordingViewController: UIViewController {
         //self
         view.backgroundColor = .black
         
+        //get black bar size (will be even on top and bottom) to position UI elements on the video frames themselves
+        
+        let videoWidthRatioOnScreen = view.bounds.width/1080.0
+        let heightOfVideoOnScreen = 1920.0*videoWidthRatioOnScreen
+        var blackBarHeight = (view.bounds.height - heightOfVideoOnScreen)/2
+        if blackBarHeight < 0 {
+            blackBarHeight = 0
+        }
+        
         //recording button
         view.addSubview(recordingButton)
         
         NSLayoutConstraint.activate([
             recordingButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
-            recordingButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -32)
+            recordingButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -(blackBarHeight+5))
         ])
         
         recordingButton.isUserInteractionEnabled = false
@@ -74,10 +83,10 @@ class RecordingViewController: UIViewController {
         view.addSubview(switchCameraButton)
         
         NSLayoutConstraint.activate([
-            switchCameraButton.heightAnchor.constraint(equalToConstant: 25),
-            switchCameraButton.widthAnchor.constraint(equalToConstant: 24),
-            switchCameraButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            switchCameraButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -19)
+            switchCameraButton.heightAnchor.constraint(equalToConstant: 20),
+            switchCameraButton.widthAnchor.constraint(equalToConstant: 20),
+            switchCameraButton.topAnchor.constraint(equalTo: view.topAnchor, constant: blackBarHeight + 5),
+            switchCameraButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10)
         ])
         
         switchCameraButton.isUserInteractionEnabled = false
@@ -127,6 +136,21 @@ class RecordingViewController: UIViewController {
                     }))
                     self.present(warning, animated: true)
                 }
+            }
+        }
+    }
+    
+    fileprivate func animateOut(){
+        UIView.animate(withDuration: 0.1, animations: {
+            self.switchCameraButton.alpha = 0
+        }) { [weak self] _ in
+            guard let self = self else {return}
+            let previewVC = PreviewViewController()
+            previewVC.modalPresentationStyle = .fullScreen
+            previewVC.modalTransitionStyle = .crossDissolve
+            self.present(previewVC, animated: false) {
+                self.videoNumber = 0
+                self.switchCameraButton.alpha = 1
             }
         }
     }
@@ -187,12 +211,7 @@ extension RecordingViewController : RecordingDelegate {
         } else {
             print("captured 2 videos!")
             //go to next screen
-            let previewVC = PreviewViewController()
-            previewVC.modalPresentationStyle = .fullScreen
-            previewVC.modalTransitionStyle = .crossDissolve
-            self.present(previewVC, animated: true) {
-                self.videoNumber = 0
-            }
+            animateOut()
         }
     }
     

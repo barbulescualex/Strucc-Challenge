@@ -27,6 +27,9 @@ class PreviewViewController: UIViewController {
     
     fileprivate var playerLayer : AVPlayerLayer?
     
+    //just for the animation in
+    fileprivate var recordingButton = RecordingButton(withSize: 70)
+    
     //MARK:- Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,10 +38,32 @@ class PreviewViewController: UIViewController {
         setupManager()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        UIView.animate(withDuration: 0.1) {
+            self.cancelButton.alpha = 1
+        }
+    }
+    
     //MARK:- Setup
     fileprivate func setupView(){
         //self
         view.backgroundColor = .black
+        
+        //get black bar size (will be even on top and bottom) to position UI elements on the video frames themselves
+        let videoWidthRatioOnScreen = view.bounds.width/1080.0
+        let heightOfVideoOnScreen = 1920.0*videoWidthRatioOnScreen
+        var blackBarHeight = (view.bounds.height - heightOfVideoOnScreen)/2
+        if blackBarHeight < 0 {
+            blackBarHeight = 0
+        }
+        
+        //recordingButton
+        view.addSubview(recordingButton)
+        NSLayoutConstraint.activate([
+            recordingButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+            recordingButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -(blackBarHeight+5))
+        ])
         
         //carousel
         view.addSubview(carouselView)
@@ -49,13 +74,32 @@ class PreviewViewController: UIViewController {
             carouselView.heightAnchor.constraint(equalTo: view.heightAnchor, multiplier: 0.25)
         ])
         carouselView.isUserInteractionEnabled = false
+        carouselView.alpha = 0
+        
+        view.addSubview(carouselView.currentFilterView)
+        view.addSubview(carouselView.currentFilterLabel)
+        NSLayoutConstraint.activate([
+            carouselView.currentFilterView.heightAnchor.constraint(equalToConstant: 70),
+            carouselView.currentFilterView.widthAnchor.constraint(equalToConstant: 70),
+            carouselView.currentFilterView.centerXAnchor.constraint(equalTo: carouselView.centerXAnchor),
+            carouselView.currentFilterView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -(blackBarHeight+30)),
+            
+            carouselView.currentFilterLabel.centerXAnchor.constraint(equalTo: carouselView.centerXAnchor),
+            carouselView.currentFilterLabel.topAnchor.constraint(equalTo: carouselView.currentFilterView.bottomAnchor),
+            carouselView.currentFilterLabel.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -blackBarHeight)
+        ])
+        
+        carouselView.currentFilterView.layer.cornerRadius = 70/2
         
         //cancel button
         view.addSubview(cancelButton)
         NSLayoutConstraint.activate([
-            cancelButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 12),
-            cancelButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -12)
+            cancelButton.heightAnchor.constraint(equalToConstant: 20),
+            cancelButton.widthAnchor.constraint(equalToConstant: 20),
+            cancelButton.topAnchor.constraint(equalTo: view.topAnchor, constant: blackBarHeight + 5),
+            cancelButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10)
         ])
+        cancelButton.alpha = 0
         
         cancelButton.addTarget(self, action: #selector(cancelTapped(_:)), for: .touchUpInside)
     }
@@ -81,14 +125,60 @@ class PreviewViewController: UIViewController {
     @objc fileprivate func cancelTapped(_ sender: UIButton) {
         //pause the player so the audio doesn't continue until the manager is deallocated
         previewManager?.pause()
-        self.dismiss(animated: true, completion: nil)
+        animateOut()
     }
     
     //MARK:- Functions
     fileprivate func addPlayerLayer(_ playerLayer: AVPlayerLayer) {
-        view.layer.insertSublayer(playerLayer, below: carouselView.layer)
+        view.layer.insertSublayer(playerLayer, below: recordingButton.layer)
         playerLayer.frame = view.layer.frame
         self.playerLayer = playerLayer
+    }
+    
+    fileprivate func animateIn(){
+        //this is going to "transform" the recording button into the carousel view
+        carouselView.updateLayout()
+        
+        UIView.animate(withDuration: 0.15, animations: { [weak self] in
+            guard let self = self else {return}
+            self.recordingButton.transform = CGAffineTransform(translationX: 0, y: -25)
+        }) {[weak self] _ in
+            guard let self = self else {return}
+            UIView.animate(withDuration: 0.15, animations: {
+                self.recordingButton.alpha = 0
+                self.carouselView.alpha = 1
+                for iv in self.carouselView.imageViews {
+                    iv.alpha = 1
+                }
+            }) { [weak self] _ in
+                guard let self = self else {return}
+                self.carouselView.isUserInteractionEnabled = true
+                self.recordingButton.transform = .identity
+            }
+        }
+        
+    }
+    
+    fileprivate func animateOut(){
+        UIView.animate(withDuration: 0.15, animations: {
+            self.cancelButton.alpha = 0
+            for iv in self.carouselView.imageViews {
+                iv.alpha = 0
+            }
+            self.carouselView.transform = CGAffineTransform(translationX: 0, y: 25)
+            self.carouselView.currentFilterView.transform = CGAffineTransform(translationX: 0, y: 25)
+            self.carouselView.currentFilterLabel.alpha = 0
+        }) { [weak self] _ in
+            guard let self = self else {return}
+            UIView.animate(withDuration: 0.15, animations: {
+                self.carouselView.currentFilterView.alpha = 0
+                self.recordingButton.alpha = 1
+                self.cancelButton.alpha = 0
+            }) { [weak self] _ in
+                guard let self = self else {return}
+                self.dismiss(animated: false, completion: nil)
+            }
+        }
     }
     
 }
@@ -96,7 +186,7 @@ class PreviewViewController: UIViewController {
 //MARK:- PreviewManagerDelegate
 extension PreviewViewController : PreviewManagerDelegate {
     func previewStarted(_ manager: PreviewManager) {
-        carouselView.isUserInteractionEnabled = true
+        self.animateIn()
     }
     
     func previewLayerReady(playerLayer: AVPlayerLayer, _ manager: PreviewManager) {
@@ -108,7 +198,7 @@ extension PreviewViewController : PreviewManagerDelegate {
         warning.addAction(UIAlertAction(title: "Try again", style: .default, handler: { [weak self] _ in
             guard let self = self else {return}
             //take user back to recording screen
-            self.dismiss(animated: true, completion: nil)
+            self.animateOut()
         }))
         self.present(warning, animated: true, completion: nil)
     }

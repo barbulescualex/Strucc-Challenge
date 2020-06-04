@@ -30,12 +30,11 @@ class FilterCarouselView: UIView {
     fileprivate var modelPos = 0
     fileprivate var currentFilterIndex = 0
     fileprivate var startPos = 2
-    fileprivate var layoutUpdated = false
     
     fileprivate var spacingBetweenPreviews : CGFloat = 0
     
     //MARK:- View Components
-    private let currentFilterLabel : UILabel = {
+    public let currentFilterLabel : UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .white
@@ -45,7 +44,7 @@ class FilterCarouselView: UIView {
         return label
     }()
     
-    private let currentFilterView : UIView = {
+    public let currentFilterView : UIView = {
         let view = UIView()
         view.backgroundColor = .clear
         view.translatesAutoresizingMaskIntoConstraints = false
@@ -54,7 +53,7 @@ class FilterCarouselView: UIView {
         return view
     }()
     
-    private var imageViews : [UIImageView] = []
+    public var imageViews : [UIImageView] = []
     
     //MARK:- Init
     public init(withModel model: [FilterModel]) {
@@ -67,12 +66,6 @@ class FilterCarouselView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    //MARK:- Lifecycle
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        updateLayout()
-    }
-    
     //MARK:- View Setup
     fileprivate func setupView(){
         translatesAutoresizingMaskIntoConstraints = false
@@ -83,6 +76,7 @@ class FilterCarouselView: UIView {
             imageView.translatesAutoresizingMaskIntoConstraints = false
             imageView.tag = i
             imageView.contentMode = .scaleAspectFill
+            imageView.alpha = 0
             imageViews.append(imageView)
             if i != 3 {
                 addSubview(imageView)
@@ -98,27 +92,6 @@ class FilterCarouselView: UIView {
             imageView.isUserInteractionEnabled = true
         }
         
-        //current filter view
-        addSubview(currentFilterView)
-        addSubview(currentFilterLabel)
-        
-        currentFilterView.layer.cornerRadius = 70/2
-        
-        NSLayoutConstraint.activate([
-            currentFilterView.heightAnchor.constraint(equalToConstant: 70),
-            currentFilterView.widthAnchor.constraint(equalToConstant: 70),
-            currentFilterView.centerXAnchor.constraint(equalTo: centerXAnchor),
-            currentFilterView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -49),
-            
-            currentFilterLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
-            currentFilterLabel.topAnchor.constraint(equalTo: currentFilterView.bottomAnchor, constant: 20)
-        ])
-        
-        currentFilterView.addSubview(imageViews[3])
-        NSLayoutConstraint.constrain(firstView: imageViews[3], toSecondView: currentFilterView, withEqualSpacing: 4)
-        imageViews[3].layer.cornerRadius = (70-4*2)/2
-        imageViews[3].clipsToBounds = true
-        
         //gesture recognizers
         let rightSwipeRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(swipedFilters(_:)))
         rightSwipeRecognizer.direction = .right
@@ -129,8 +102,13 @@ class FilterCarouselView: UIView {
         addGestureRecognizer(leftSwipeRecognizer)
     }
     
-    fileprivate func updateLayout(){
-        if layoutUpdated { return }
+    /* called by superview after it has positioned the currentFilterView and label so that the rest of the view can configure itself accordingly */
+    public func updateLayout(){
+        //updated center imageView to be in the currentFilterView
+        currentFilterView.addSubview(imageViews[3])
+        NSLayoutConstraint.constrain(firstView: imageViews[3], toSecondView: currentFilterView, withEqualSpacing: 4)
+        imageViews[3].layer.cornerRadius = (70-4*2)/2
+        imageViews[3].clipsToBounds = true
         
         //get equal spacing between all the inactive filter views around the center active view
         let halfCurrentFilterViewWidth = currentFilterView.frame.width/2
@@ -157,8 +135,6 @@ class FilterCarouselView: UIView {
             imageViews[6].centerYAnchor.constraint(equalTo: currentFilterView.centerYAnchor),
             imageViews[6].leadingAnchor.constraint(equalTo: imageViews[5].trailingAnchor, constant: spacingBetweenPreviews)
         ])
-        
-        layoutUpdated = true
     }
     
     //MARK:- Carousel Functions
