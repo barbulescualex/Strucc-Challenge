@@ -25,3 +25,11 @@ There are 6 classes here (5 files). The communication structure is the same as f
 The PreviewViewController handles the view and mediating some logic between the rest of the classes. The PreviewManager which handles creating the composition and returning the preview layer. A FilterCarouselView class which is a carousel view and works off of a FilterModel input. The FilterModel represents the filters to display. A CustomCompositor (AVVideoCompositing subclass) to apply the intended effects to the video composition. And finally there's a singleton which the manager updates so that the custom compositor can know which filter to apply during it's runtime.
 
 The compositon is done by building the assets for the videos from the user's temp directory, adding the relevant tracks and then having them be processed by the custom compositor. The playback is handled by a simple AVPlayer.
+
+## Running It
+
+I have found that when running with the debugger attached on my iPhone X, the first time you press the start button there is a long delay before the CAAnimation takes place. I could not reproduce this on any other devices and works fine on my iPhone X when the debugger is not attached.
+
+Also, sometimes the app runs slower when the wireless debugger is attached, maybe my internet just sucks 😔.
+
+The app itself though, runs very smoothly 😌, even on older devices.
