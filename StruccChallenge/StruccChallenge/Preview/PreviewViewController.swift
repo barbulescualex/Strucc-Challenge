@@ -13,6 +13,10 @@ class PreviewViewController: UIViewController {
     //MARK:- Vars
     fileprivate var previewManager: PreviewManager?
     
+    override var prefersStatusBarHidden: Bool {
+        return true
+    }
+    
     //MARK:- View Components
     fileprivate let carouselView = FilterCarouselView(withModel: [])
     

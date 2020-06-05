@@ -18,6 +18,10 @@ class RecordingViewController: UIViewController {
     
     fileprivate var firstLoad = true
     
+    override var prefersStatusBarHidden: Bool {
+        return true
+    }
+    
     //MARK:- View Components
     fileprivate let recordingButton = RecordingButton(withSize: 70)
     
