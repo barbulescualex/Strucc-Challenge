@@ -79,12 +79,12 @@ class RecordingButton: UIView {
     
     //MARK:- Actions
     @objc fileprivate func didTap(_ sender: UIButton){
-        if recording {
+        recording = !recording
+        if !recording {
             delegate?.didStopRecording(self)
         } else {
             delegate?.didStartRecording(self)
         }
-        recording = !recording
         changeSublayer()
     }
     

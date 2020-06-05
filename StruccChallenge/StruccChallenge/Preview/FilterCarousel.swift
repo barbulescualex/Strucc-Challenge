@@ -88,7 +88,6 @@ class FilterCarouselView: UIView {
                 ])
                 imageView.layer.cornerRadius = 42/2
                 imageView.clipsToBounds = true
-            } else {
                 let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(tappedFilter(_:)))
                 imageView.addGestureRecognizer(tapRecognizer)
                 imageView.isUserInteractionEnabled = true

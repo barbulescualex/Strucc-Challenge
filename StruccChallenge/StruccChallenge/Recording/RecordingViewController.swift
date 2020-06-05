@@ -177,7 +177,7 @@ extension RecordingViewController : RecordingButtonDelegate {
     func didStartRecording(_ button: RecordingButton) {
         //tell manager to start recording
         recordingManager?.startRecording()
-        
+
         //don't let user switch camera
         switchCameraButton.isUserInteractionEnabled = false
     }
@@ -185,10 +185,10 @@ extension RecordingViewController : RecordingButtonDelegate {
     func didStopRecording(_ button: RecordingButton) {
         //tell manager to stop recording
         recordingManager?.stopRecording()
-        
+
         //disable capture button, once writer finishes and next writer starts, capture button will work again
         recordingButton.isUserInteractionEnabled = false
-        
+
         //turn on camera switching
         switchCameraButton.isUserInteractionEnabled = true
     }

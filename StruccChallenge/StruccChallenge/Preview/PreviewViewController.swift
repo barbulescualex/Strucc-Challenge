@@ -44,6 +44,7 @@ class PreviewViewController: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
+        //independent of the animations in animateIn()
         UIView.animate(withDuration: 0.1) {
             self.cancelButton.alpha = 1
         }
@@ -171,7 +172,6 @@ class PreviewViewController: UIViewController {
     fileprivate func animateOut(){
         fadePlayerLayer(visible: false)
         UIView.animate(withDuration: 0.15, animations: {
-            self.cancelButton.alpha = 0
             for iv in self.carouselView.imageViews {
                 iv.alpha = 0
             }
