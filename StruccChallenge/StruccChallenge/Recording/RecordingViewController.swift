@@ -145,6 +145,7 @@ class RecordingViewController: UIViewController {
     }
     
     fileprivate func animateOut(){
+        fadePreviewLayer(visible: false)
         UIView.animate(withDuration: 0.1, animations: {
             self.switchCameraButton.alpha = 0
         }) { [weak self] _ in
@@ -157,6 +158,16 @@ class RecordingViewController: UIViewController {
                 self.switchCameraButton.alpha = 1
             }
         }
+    }
+    
+    fileprivate func fadePreviewLayer(visible: Bool){
+        let animation = CABasicAnimation(keyPath: "opacity")
+        animation.fromValue = visible ? 0 : 1
+        animation.toValue = visible ? 1 : 0
+        animation.duration = 0.2
+        animation.timingFunction = .init(name: CAMediaTimingFunctionName.easeInEaseOut)
+        previewLayer?.add(animation, forKey: nil)
+        previewLayer?.opacity = visible ? 1 : 0
     }
 
 }
@@ -220,6 +231,7 @@ extension RecordingViewController : RecordingDelegate {
     }
     
     func sessionStarted(manager: RecordingManager) {
+        fadePreviewLayer(visible: true)
         //setup writer
         videoNumber += 1
         manager.setupWriter(forVideoNumber: videoNumber)
@@ -242,8 +254,11 @@ extension RecordingViewController : RecordingDelegate {
     
     func sessionPreviewLayerReady(previewLayer layer: AVCaptureVideoPreviewLayer, manager: RecordingManager) {
         //add preview layer to our view hierarchy
+        previewLayer = layer
         view.layer.insertSublayer(layer, below: recordingButton.layer)
         layer.frame = self.view.layer.frame
+        
+        previewLayer?.opacity = 0
     }
     
     

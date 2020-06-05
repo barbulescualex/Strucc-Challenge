@@ -138,13 +138,14 @@ class PreviewViewController: UIViewController {
     fileprivate func addPlayerLayer(_ playerLayer: AVPlayerLayer) {
         view.layer.insertSublayer(playerLayer, below: recordingButton.layer)
         playerLayer.frame = view.layer.frame
+        playerLayer.opacity = 0
         self.playerLayer = playerLayer
     }
     
     fileprivate func animateIn(){
         //this is going to "transform" the recording button into the carousel view
+        fadePlayerLayer(visible: true)
         carouselView.updateLayout()
-        
         UIView.animate(withDuration: 0.15, animations: { [weak self] in
             guard let self = self else {return}
             self.recordingButton.transform = CGAffineTransform(translationX: 0, y: -25)
@@ -168,6 +169,7 @@ class PreviewViewController: UIViewController {
     }
     
     fileprivate func animateOut(){
+        fadePlayerLayer(visible: false)
         UIView.animate(withDuration: 0.15, animations: {
             self.cancelButton.alpha = 0
             for iv in self.carouselView.imageViews {
@@ -187,6 +189,16 @@ class PreviewViewController: UIViewController {
                 self.dismiss(animated: false, completion: nil)
             }
         }
+    }
+    
+    fileprivate func fadePlayerLayer(visible: Bool){
+        let animation = CABasicAnimation(keyPath: "opacity")
+        animation.fromValue = visible ? 0 : 1
+        animation.toValue = visible ? 1 : 0
+        animation.duration = 0.2
+        animation.timingFunction = .init(name: CAMediaTimingFunctionName.easeInEaseOut)
+        playerLayer?.add(animation, forKey: nil)
+        playerLayer?.opacity = visible ? 1 : 0
     }
     
 }

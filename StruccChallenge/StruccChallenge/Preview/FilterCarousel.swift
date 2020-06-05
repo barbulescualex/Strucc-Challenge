@@ -43,7 +43,6 @@ class FilterCarouselView: UIView {
         label.layer.shadowRadius = 4
         label.layer.shadowOffset = .zero
         label.layer.shadowOpacity = 0.8
-//        label.layer.shouldRasterize = true
         return label
     }()
     
