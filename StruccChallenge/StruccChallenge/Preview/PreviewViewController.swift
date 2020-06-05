@@ -101,10 +101,10 @@ class PreviewViewController: UIViewController {
         //cancel button
         view.addSubview(cancelButton)
         NSLayoutConstraint.activate([
-            cancelButton.heightAnchor.constraint(equalToConstant: 20),
-            cancelButton.widthAnchor.constraint(equalToConstant: 20),
-            cancelButton.topAnchor.constraint(equalTo: view.topAnchor, constant: blackBarHeight + 5),
-            cancelButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -10)
+            cancelButton.heightAnchor.constraint(equalToConstant: 17),
+            cancelButton.widthAnchor.constraint(equalToConstant: 17),
+            cancelButton.topAnchor.constraint(equalTo: view.topAnchor, constant: blackBarHeight + 6.5),
+            cancelButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -11.5)
         ])
         cancelButton.alpha = 0
         
