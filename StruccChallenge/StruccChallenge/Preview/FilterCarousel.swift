@@ -88,10 +88,11 @@ class FilterCarouselView: UIView {
                 ])
                 imageView.layer.cornerRadius = 42/2
                 imageView.clipsToBounds = true
+            } else {
+                let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(tappedFilter(_:)))
+                imageView.addGestureRecognizer(tapRecognizer)
+                imageView.isUserInteractionEnabled = true
             }
-            let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(tappedFilter(_:)))
-            imageView.addGestureRecognizer(tapRecognizer)
-            imageView.isUserInteractionEnabled = true
         }
         
         //gesture recognizers
@@ -102,6 +103,10 @@ class FilterCarouselView: UIView {
         let leftSwipeRecognizer = UISwipeGestureRecognizer(target: self, action: #selector(swipedFilters(_:)))
         leftSwipeRecognizer.direction = .left
         addGestureRecognizer(leftSwipeRecognizer)
+        
+        //let the swipe gestures through since these are not part of this view's hierarchy
+        currentFilterView.isUserInteractionEnabled = false
+        currentFilterLabel.isUserInteractionEnabled = false
     }
     
     /* called by superview after it has positioned the currentFilterView and label so that the rest of the view can configure itself accordingly */
